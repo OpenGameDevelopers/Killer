@@ -1,0 +1,13 @@
+KILLER | README
+
+OVERVIEW
+Killer is a 3D beat-'em-up game for the Pandora.  This is currently in the
+prototype phase, the work here will be evolving constantly.  Please report any
+undocumented bugs for the Pandora only.  Linux builds are for emulating the
+Pandora by using the PowerVR SDK libraries.  Do not expect this to run on Linux
+without a gamepad supporting two analogue sticks, a directional pad, and nine
+buttons.
+
+Build instructions will follow later.
+
+
