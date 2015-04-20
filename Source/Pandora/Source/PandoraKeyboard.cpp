@@ -207,7 +207,7 @@ namespace Killer
 			// No data, return
 			memcpy( p_pState, &m_KeyState, sizeof( m_KeyState ) );
 
-			return KIL_FAIL;
+			return KIL_OK;
 		}
 
 		for( size_t i = 0; i < Read / sizeof( Event[ 0 ] ); ++i )

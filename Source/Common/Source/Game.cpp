@@ -37,6 +37,12 @@ namespace Killer
 			return KIL_FAIL;
 		}
 
+		if( m_Gamepad.Initialise( ) != KIL_OK )
+		{
+			std::cout << "[Killer::Game::Initialise] <ERROR> "
+				"Failed to initialise the gamepad" << std::endl;
+		}
+
 		m_Renderer.SetClearColour( 1.0f, 153 / 255.0f, 51.0f / 255.0f );
 		
 		return KIL_OK;
@@ -44,18 +50,23 @@ namespace Killer
 
 	KIL_UINT32 Game::Execute( )
 	{
-		KEYSTATE OldKeyState;
-
 		KIL_BOOL Quit = 0;
 
 		while( !Quit )
 		{
 			m_Window.ProcessEvents( );
-			KEYSTATE CurrentKeyState;
+			KEY_STATE CurrentKeyState;
+			GAMEPAD_STATE CurrentGamepadState;
 
 			m_Keyboard.GetState( &CurrentKeyState );
+			m_Gamepad.GetState( &CurrentGamepadState );
 
 			if( CurrentKeyState.Keys[ KEY_ESCAPE ] )
+			{
+				Quit = KIL_TRUE;
+			}
+
+			if( CurrentGamepadState.Buttons & GAMEPAD_BUTTON_START )
 			{
 				Quit = KIL_TRUE;
 			}

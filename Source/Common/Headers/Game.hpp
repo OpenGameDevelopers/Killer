@@ -5,6 +5,7 @@
 #include <GameWindow.hpp>
 #include <Renderer.hpp>
 #include <Keyboard.hpp>
+#include <Gamepad.hpp>
 
 namespace Killer
 {
@@ -21,6 +22,7 @@ namespace Killer
 		GameWindow	m_Window;
 		Renderer	m_Renderer;
 		Keyboard	m_Keyboard;
+		Gamepad		m_Gamepad;
 	};
 }
 
