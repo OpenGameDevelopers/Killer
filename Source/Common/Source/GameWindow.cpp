@@ -109,10 +109,6 @@ namespace Killer
 			return KIL_FAIL;
 		}
 
-		glClearColor( 1.0f, 153.0f / 255.0f, 51.0f / 255.0f, 1.0f );
-		glClear( GL_COLOR_BUFFER_BIT );
-		eglSwapBuffers( m_EGLDisplay, m_EGLSurface );
-
 		return KIL_OK;
 	}
 
@@ -144,6 +140,16 @@ namespace Killer
 	KIL_UINT32 GameWindow::ProcessEvents( )
 	{
 		return KIL_OK;
+	}
+
+	EGLDisplay GameWindow::GetEGLDisplay( ) const
+	{
+		return m_EGLDisplay;
+	}
+
+	EGLSurface GameWindow::GetEGLSurface( ) const
+	{
+		return m_EGLSurface;
 	}
 }
 

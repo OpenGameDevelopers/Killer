@@ -11,6 +11,8 @@ typedef int16_t			KIL_SINT16;
 typedef uint16_t		KIL_UINT16;
 typedef int32_t			KIL_SINT32;
 typedef uint32_t		KIL_UINT32;
+typedef float			KIL_FLOAT32;
+typedef double			KIL_FLOAT64;
 
 typedef KIL_UCHAR	KIL_BYTE;
 

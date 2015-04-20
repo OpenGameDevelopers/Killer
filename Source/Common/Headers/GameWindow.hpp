@@ -16,6 +16,9 @@ namespace Killer
 		KIL_UINT32 Destroy( );
 		KIL_UINT32 ProcessEvents( );
 
+		EGLDisplay GetEGLDisplay( ) const;
+		EGLSurface GetEGLSurface( ) const;
+
 	private:
 		EGLDisplay	m_EGLDisplay;
 		EGLSurface	m_EGLSurface;
