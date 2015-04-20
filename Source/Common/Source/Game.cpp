@@ -1,6 +1,5 @@
 #include <Game.hpp>
 #include <iostream>
-#include <unistd.h>
 
 namespace Killer
 {
@@ -30,6 +29,14 @@ namespace Killer
 			return KIL_FAIL;
 		}
 
+		if( m_Keyboard.Initialise( ) != KIL_OK )
+		{
+			std::cout << "[Killer::Game::Initialise] <ERROR> "
+				"Failed to initialise the keyboard" << std::endl;
+
+			return KIL_FAIL;
+		}
+
 		m_Renderer.SetClearColour( 1.0f, 153 / 255.0f, 51.0f / 255.0f );
 		
 		return KIL_OK;
@@ -37,11 +44,25 @@ namespace Killer
 
 	KIL_UINT32 Game::Execute( )
 	{
-		m_Window.ProcessEvents( );
-		m_Renderer.Clear( );
-		m_Renderer.SwapBuffers( );
+		KEYSTATE OldKeyState;
 
-		sleep( 3 );
+		KIL_BOOL Quit = 0;
+
+		while( !Quit )
+		{
+			m_Window.ProcessEvents( );
+			KEYSTATE CurrentKeyState;
+
+			m_Keyboard.GetState( &CurrentKeyState );
+
+			if( CurrentKeyState.Keys[ KEY_ESCAPE ] )
+			{
+				Quit = KIL_TRUE;
+			}
+			
+			m_Renderer.Clear( );
+			m_Renderer.SwapBuffers( );
+		}
 
 		return KIL_OK;
 	}

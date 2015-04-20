@@ -4,6 +4,7 @@
 #include <DataTypes.hpp>
 #include <GameWindow.hpp>
 #include <Renderer.hpp>
+#include <Keyboard.hpp>
 
 namespace Killer
 {
@@ -19,6 +20,7 @@ namespace Killer
 	private:
 		GameWindow	m_Window;
 		Renderer	m_Renderer;
+		Keyboard	m_Keyboard;
 	};
 }
 

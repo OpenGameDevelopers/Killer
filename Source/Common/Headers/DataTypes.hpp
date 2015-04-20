@@ -15,9 +15,15 @@ typedef float			KIL_FLOAT32;
 typedef double			KIL_FLOAT64;
 
 typedef KIL_UCHAR	KIL_BYTE;
+typedef KIL_UINT32	KIL_BOOL;
+
+const KIL_UINT32 KIL_TRUE	= 1;
+const KIL_UINT32 KIL_FALSE	= 0;
 
 const KIL_UINT32 KIL_OK		= 0X00000000;
 const KIL_UINT32 KIL_FAIL	= 0x7FFFFFFF;
+
+#define KIL_NULL nullptr
 
 #endif // __KILLER_DATATYPES_HPP__
 
