@@ -30,17 +30,17 @@ SYSIPATH	=
 
 CPP = ${TOOL_PREFIX}g++
 
-CPPFLAGS	=	-c -DAURA_BUILD_$(BUILD_DEF) \
-				-DAURA_PLATFORM_$(BUILD_PLATFORM) \
-				-DAURA_PLATFORM_$(BUILD_PLATFORM)_$(BUILD_ARCH) \
-				-DAURA_PLATFORM_$(BUILD_PLATFORM)_$(BUILD_ARCH)_$(BITSIZE) \
-				-DAURA_BITSIZE_$(BITSIZE) -DAURA_ARCH_$(BUILD_ARCH) \
+CPPFLAGS	=	-c -DKIL_BUILD_$(BUILD_DEF) \
+				-DKIL_PLATFORM_$(BUILD_PLATFORM) \
+				-DKIL_PLATFORM_$(BUILD_PLATFORM)_$(BUILD_ARCH) \
+				-DKIL_PLATFORM_$(BUILD_PLATFORM)_$(BUILD_ARCH)_$(BITSIZE) \
+				-DKIL_BITSIZE_$(BITSIZE) -DKIL_ARCH_$(BUILD_ARCH) \
 				-I$(TOPSRC)/$(PLATFORM)/Headers -I$(TOPSRC)/Common/Headers
 SYSIPATH	=
 INCPATH		=
 SYSLPATH	=	
 LIBPATH		=
-SYSLIBS		=	-lEGL -lGLESv2 -lrt -pthread
+SYSLIBS		=	-lEGL -lGLESv2 -lrt -pthread -lX11
 LINKFLAGS	=
 
 ##### Debug #######
@@ -48,7 +48,7 @@ debug:		BUILD		= Debug
 debug:		BUILD_TYPE	= debug
 debug:		BUILD_DEF	= DEBUG
 debug:		TARGET := $(TARGET)D
-debug:		CPPFLAGS += -g -ggdb -Wall -D_DEBUG $(CPPFLAGS_EXT)
+debug:		CPPFLAGS += -O0 -ggdb -g3 -Wall -D_DEBUG $(CPPFLAGS_EXT)
 debug:		LIBS =
 debug:		$(TARGET)
 
@@ -114,7 +114,7 @@ $(TARGET): $(OBJS)
 	@printf "%s" "------------------------------------------------------------"
 	@printf "%s\n\n" "-------------------"
 	@printf "Creating: $(OUTFILE)... "
-	@$(CPP) -o $(OUTFILE) $(LINKFLAGS) $(OBJS) $(SYSLPATH) \
+	@$(CPP) -ggdb -g3 -o $(OUTFILE) $(LINKFLAGS) $(OBJS) $(SYSLPATH) \
 	$(LIBPATH) $(LIBS) $(SYSLIBS) 2> lmsgs;\
 	RETVAL=$$?;\
 	if env | grep -q ^TERM=; then\

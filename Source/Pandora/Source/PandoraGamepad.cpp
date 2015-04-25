@@ -220,10 +220,6 @@ namespace Killer
 							Event[ i ].value / 256.0f;
 					}
 
-					std::cout << "Stick[ " << ( Stick ? "Right" : "Left" ) <<
-						" ] < " << m_GamepadState.AnalogueStick[ Stick ].X <<
-						", " << m_GamepadState.AnalogueStick[ Stick ].Y <<
-						" >" << std::endl;
 					break;
 				}
 				case EV_KEY:
