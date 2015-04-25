@@ -193,8 +193,9 @@ namespace Killer
 
 	static void *X11Handler( void *p_pArg )
 	{
+		XInitThreads( );
 
-		g_pDisplay = XOpenDisplay( NULL );
+		g_pDisplay = XOpenDisplay( KIL_NULL );
 
 		if( g_pDisplay == KIL_NULL )
 		{
@@ -251,8 +252,15 @@ namespace Killer
 					SignalMainThread( );
 
 					while( XCheckTypedEvent( g_pDisplay, Expose, &Event ) )
+						;
+					break;
+				}
+				case ClientMessage:
+				{
+					if( *XGetAtomName( g_pDisplay,
+						Event.xclient.message_type ) == *"WM_PROTOCOLS" )
 					{
-						std::cout << "Got expose" << std::endl;
+						Run = KIL_FALSE;
 					}
 					break;
 				}
@@ -263,7 +271,6 @@ namespace Killer
 			}
 		}
 
-		// There is no way to reach here, but it would be nice to
 		XDestroyWindow( g_pDisplay, g_Window );
 		XCloseDisplay( g_pDisplay );
 
@@ -367,7 +374,8 @@ namespace Killer
 		g_KeyboardFileDescriptor = -1;
 	}
 
-		pthread_t g_ThreadID;
+	pthread_t g_ThreadID;
+
 	KIL_UINT32 EnterPandoraFullscreen( )
 	{
 		// Create a hidden X window to consume the XEvent messages
@@ -419,6 +427,25 @@ namespace Killer
 		{
 			HideConsoleEnd( );
 		}
+
+		if( g_HaveX == KIL_TRUE )
+		{
+			XEvent Event;
+			memset( &Event, 0, sizeof( Event ) );
+			Event.xclient.type = ClientMessage;
+			Event.xclient.window = g_Window;
+			Event.xclient.message_type = XInternAtom( g_pDisplay,
+				"WM_PROTOCOLS", True );
+			Event.xclient.format = 32;
+			Event.xclient.data.l[ 0 ] = XInternAtom( g_pDisplay,
+				"WM_DELETE_WINDOW", False );
+			Event.xclient.data.l[ 1 ] = CurrentTime;
+
+			XSendEvent( g_pDisplay, g_Window, False, NoEventMask, &Event );
+			XFlush( g_pDisplay );
+		}
+
+		pthread_join( g_ThreadID, KIL_NULL );
 
 		if( g_DesktopSaved == KIL_TRUE )
 		{
