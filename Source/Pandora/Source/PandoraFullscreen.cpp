@@ -381,7 +381,7 @@ namespace Killer
 		// Create a hidden X window to consume the XEvent messages
 		char *pThreadName;
 		pThreadName = new char[ 80 ];
-		strncpy( pThreadName, "HiddenWindow", sizeof( pThreadName ) );
+		strncpy( pThreadName, "HiddenWindow", strlen( pThreadName ) );
 		pthread_mutex_lock( &g_StartMutex );
 		int Error = pthread_create( &g_ThreadID, KIL_NULL, X11Handler,
 			pThreadName );

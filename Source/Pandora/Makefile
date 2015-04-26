@@ -25,7 +25,9 @@ GCCVER	= $(shell $(CPP) -dumpversion)
 
 BUILD_TYPE := debug
 
-CPPFLAGS_EXT	= -ffriend-injection -std=c++11
+CPPFLAGS_EXT	=	-ffriend-injection -std=c++11 -mcpu=cortex-a8 \
+					-Wa,-mcpu=cortex-a8 -mfpu=neon -Wa,-mfpu=neon \
+					-mfloat-abi=softfp
 SYSIPATH	=
 
 CPP = ${TOOL_PREFIX}g++
