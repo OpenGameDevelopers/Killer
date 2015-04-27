@@ -173,8 +173,6 @@ namespace Killer
 			PreviousTime = Second + Microsecond;
 
 			pThisInst->m_ElapsedTime += DeltaTime;
-
-			std::cout << "Delta: " << DeltaTime << std::endl;
 		}
 
 		return KIL_NULL;
