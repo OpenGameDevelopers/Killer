@@ -1,6 +1,8 @@
 #include <Game.hpp>
 #include <iostream>
 #include <Vector3.hpp>
+#include <Timer.hpp>
+#include <unistd.h>
 
 namespace Killer
 {
@@ -51,6 +53,7 @@ namespace Killer
 
 	KIL_UINT32 Game::Execute( )
 	{
+		Timer MathTimer;
 		std::cout << "Vector3 test" << std::endl;
 		Vector3 V1, V2, V3;
 		V1 = Vector3( 1.0f, 0.0f, 0.0f );
@@ -66,14 +69,20 @@ namespace Killer
 
 		V3 = V1;
 
+		MathTimer.Start( );
 		V3 = V1.Cross( V2 );
+		MathTimer.Stop( );
 		std::cout << "Crossing V1 and V2" << std::endl << "Result: ";
 		V3.Print( );
-		std::cout << std::endl;
+		std::cout << " Took: " << MathTimer.GetMicroseconds( ) << "us" <<
+			std::endl;
 
+		MathTimer.Start( );
 		KIL_FLOAT32 Dot = V1.Dot( V2 );
+		MathTimer.Stop( );
 
-		std::cout << "Dot of V1.V2: " << Dot << std::endl;
+		std::cout << "Dot of V1.V2: " << Dot << " Took: " <<
+			MathTimer.GetMicroseconds( ) << "us" << std::endl;
 
 		V1 = Vector3( 10.0f, 12.0f, 70.0f );
 		std::cout << "Normalising V1: ";
@@ -98,7 +107,23 @@ namespace Killer
 		KIL_FLOAT32 Distance = V1.Distance( V2 );
 		std::cout << std::endl << "Distance: " << Distance << std::endl;
 
+		Timer TestTimer;
+
+		std::cout << "Time: " << TestTimer.GetMicroseconds( ) << std::endl;
+
+		TestTimer.Start( );
+
 		KIL_BOOL Quit = 0;
+
+		Timer NewTimer;
+
+		//NewTimer.Start( );
+
+		Timer RestartTimer;
+		//RestartTimer.Start( );
+
+		KIL_BOOL Running = KIL_TRUE;
+
 
 		while( !Quit )
 		{
@@ -121,7 +146,35 @@ namespace Killer
 			
 			m_Renderer.Clear( );
 			m_Renderer.SwapBuffers( );
+/*
+			if( RestartTimer.GetSeconds( ) >= 2ULL )
+			{
+				RestartTimer.Stop( );
+				if( Running == KIL_TRUE )
+				{
+					NewTimer.Pause( );
+					Running = KIL_FALSE;
+				}
+				else
+				{
+					NewTimer.Resume( );
+					Running = KIL_TRUE;
+				}
+
+				RestartTimer.Start( );
+			}*/
+
+			if( TestTimer.GetMicroseconds( ) >= 1000000ULL )
+			{
+				Quit = KIL_TRUE;
+			}
 		}
+
+		std::cout << "Time: " << TestTimer.GetMicroseconds( ) << std::endl;
+		TestTimer.Stop( );
+		std::cout << "Time: " << TestTimer.GetMicroseconds( ) << std::endl;
+
+		std::cout << "Paused timer: " << NewTimer.GetMicroseconds( ) << std::endl;
 
 		return KIL_OK;
 	}
