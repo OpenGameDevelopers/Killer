@@ -3,6 +3,7 @@
 #include <Vector3.hpp>
 #include <Timer.hpp>
 #include <unistd.h>
+#include <locale>
 
 namespace Killer
 {
@@ -107,23 +108,11 @@ namespace Killer
 		KIL_FLOAT32 Distance = V1.Distance( V2 );
 		std::cout << std::endl << "Distance: " << Distance << std::endl;
 
-		Timer TestTimer;
-
-		std::cout << "Time: " << TestTimer.GetMicroseconds( ) << std::endl;
-
-		TestTimer.Start( );
+		Timer GameTimer;
 
 		KIL_BOOL Quit = 0;
 
-		Timer NewTimer;
-
-		//NewTimer.Start( );
-
-		Timer RestartTimer;
-		//RestartTimer.Start( );
-
-		KIL_BOOL Running = KIL_TRUE;
-
+		GameTimer.Start( );
 
 		while( !Quit )
 		{
@@ -146,35 +135,18 @@ namespace Killer
 			
 			m_Renderer.Clear( );
 			m_Renderer.SwapBuffers( );
-/*
-			if( RestartTimer.GetSeconds( ) >= 2ULL )
-			{
-				RestartTimer.Stop( );
-				if( Running == KIL_TRUE )
-				{
-					NewTimer.Pause( );
-					Running = KIL_FALSE;
-				}
-				else
-				{
-					NewTimer.Resume( );
-					Running = KIL_TRUE;
-				}
-
-				RestartTimer.Start( );
-			}*/
-
-			if( TestTimer.GetMicroseconds( ) >= 1000000ULL )
-			{
-				Quit = KIL_TRUE;
-			}
 		}
 
-		std::cout << "Time: " << TestTimer.GetMicroseconds( ) << std::endl;
-		TestTimer.Stop( );
-		std::cout << "Time: " << TestTimer.GetMicroseconds( ) << std::endl;
+		GameTimer.Stop( );
 
-		std::cout << "Paused timer: " << NewTimer.GetMicroseconds( ) << std::endl;
+		// Use LC_ALL=<LANG> to get correct format
+		// LC_ALL=en_GB - British English
+		// LC_ALL=de_DE - German
+		// LC_ALL=ja_JP - Japanese
+		std::locale::global( std::locale( "" ) );
+		std::cout.imbue( std::locale( ) );
+		std::cout << "Total running time: " << GameTimer.GetMicroseconds( ) <<
+			"\u00B5s" << std::endl;
 
 		return KIL_OK;
 	}
