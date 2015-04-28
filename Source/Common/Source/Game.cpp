@@ -2,6 +2,8 @@
 #include <iostream>
 #include <Vector3.hpp>
 #include <FreeTimer.hpp>
+#include <Timer.hpp>
+#include <Time.hpp>
 #include <unistd.h>
 #include <locale>
 
@@ -63,6 +65,10 @@ namespace Killer
 
 		GameTimer.Start( );
 
+		Timer Clock;
+
+		Clock.Start( );
+
 		while( !Quit )
 		{
 			m_Window.ProcessEvents( );
@@ -84,6 +90,18 @@ namespace Killer
 			
 			m_Renderer.Clear( );
 			m_Renderer.SwapBuffers( );
+
+			if( Clock.GetSeconds( ) >= 1 )
+			{
+				BEAT_TIME BeatTime;
+				GetBeatTime( BeatTime );
+
+				std::cout << "@" << BeatTime.Beat << "." <<
+					BeatTime.CentiBeat << std::endl;
+
+				Clock.Stop( );
+				Clock.Start( );
+			}
 		}
 
 		GameTimer.Stop( );

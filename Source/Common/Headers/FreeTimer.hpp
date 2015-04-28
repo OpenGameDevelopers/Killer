@@ -6,21 +6,12 @@
 
 namespace Killer
 {
-	typedef struct __tagBEAT_TIME
-	{
-		KIL_UINT32	Beat;
-		KIL_UINT32	CentBeat;
-	}BEAT_TIME;
-
 	// The timer holds time in microseconds
 	class FreeTimer
 	{
 	public:
 		FreeTimer( );
 		~FreeTimer( );
-
-		FreeTimer( const FreeTimer &p_Other );
-		FreeTimer &operator=( const FreeTimer &p_Other );
 
 		KIL_UINT32 Start( );
 		KIL_UINT32 Stop( );
@@ -47,8 +38,6 @@ namespace Killer
 
 		static void *Run( void *p_pArg );
 	};
-
-	KIL_UINT32 GetBeatTime( );
 }
 
 #endif // __KILLER_FREETIMER_HPP__
