@@ -1,11 +1,11 @@
-#include <Timer.hpp>
+#include <FreeTimer.hpp>
 #include <cstring>
 #include <iostream>
 #include <time.h>
 
 namespace Killer
 {
-	Timer::Timer( )	:
+	FreeTimer::FreeTimer( )	:
 		m_StartTime( 0ULL ),
 		m_ElapsedTime( 0ULL ),
 		m_Running( KIL_FALSE ),
@@ -16,11 +16,11 @@ namespace Killer
 	{
 	}
 
-	Timer::~Timer( )
+	FreeTimer::~FreeTimer( )
 	{
 	}
 
-	KIL_UINT32 Timer::Start( )
+	KIL_UINT32 FreeTimer::Start( )
 	{
 		pthread_mutex_lock( &m_TimerLock );
 		struct timespec TimeSpec;
@@ -40,7 +40,7 @@ namespace Killer
 		
 		if( Error != 0 )
 		{
-			std::cout << "[Killer::Timer::Start] <ERROR> "
+			std::cout << "[Killer::FreeTimer::Start] <ERROR> "
 				"Failed to create thread" << std::endl;
 			return KIL_FAIL;
 		}
@@ -53,7 +53,7 @@ namespace Killer
 		return KIL_OK;
 	}
 
-	KIL_UINT32 Timer::Stop( )
+	KIL_UINT32 FreeTimer::Stop( )
 	{
 		pthread_cancel( m_ThreadID );
 		pthread_join( m_ThreadID, KIL_NULL );
@@ -63,7 +63,7 @@ namespace Killer
 		return KIL_OK;
 	}
 
-	KIL_UINT32 Timer::Pause( )
+	KIL_UINT32 FreeTimer::Pause( )
 	{
 		pthread_cancel( m_ThreadID );
 		pthread_join( m_ThreadID, KIL_NULL );
@@ -73,7 +73,7 @@ namespace Killer
 		return KIL_OK;
 	}
 
-	KIL_UINT32 Timer::Resume( )
+	KIL_UINT32 FreeTimer::Resume( )
 	{
 		if( m_Paused )
 		{
@@ -93,7 +93,7 @@ namespace Killer
 			
 			if( Error != 0 )
 			{
-				std::cout << "[Killer::Timer::Pause] <ERROR> "
+				std::cout << "[Killer::FreeTimer::Pause] <ERROR> "
 					"Failed to create thread" << std::endl;
 
 				return KIL_FAIL;
@@ -112,43 +112,41 @@ namespace Killer
 		return KIL_OK;
 	}
 
-	KIL_BOOL Timer::IsRunning( ) const
+	KIL_BOOL FreeTimer::IsRunning( ) const
 	{
 		return m_Running;
 	}
 
-	KIL_BOOL Timer::IsStopped( ) const
+	KIL_BOOL FreeTimer::IsStopped( ) const
 	{
 		return m_Stopped;
 	}
 
-	KIL_BOOL Timer::IsPaused( ) const
+	KIL_BOOL FreeTimer::IsPaused( ) const
 	{
 		return m_Paused;
 	}
 
-	KIL_UINT64 Timer::GetSeconds( ) const
+	KIL_UINT64 FreeTimer::GetSeconds( ) const
 	{
 		return m_ElapsedTime / 1000000ULL;
 	}
 
-	KIL_UINT64 Timer::GetMilliseconds( ) const
+	KIL_UINT64 FreeTimer::GetMilliseconds( ) const
 	{
 		return m_ElapsedTime / 1000ULL;
 	}
 
-	KIL_UINT64 Timer::GetMicroseconds( ) const
+	KIL_UINT64 FreeTimer::GetMicroseconds( ) const
 	{
 		return m_ElapsedTime;
 	}
 
-	void *Timer::Run( void *p_pArg )
+	void *FreeTimer::Run( void *p_pArg )
 	{
-		Timer *pThisInst = static_cast< Timer * >( p_pArg );
+		FreeTimer *pThisInst = static_cast< FreeTimer * >( p_pArg );
 
 		struct timespec TimeSpec;
-
-		pthread_setcanceltype( PTHREAD_CANCEL_ASYNCHRONOUS, KIL_NULL );
 
 		pthread_mutex_lock( &pThisInst->m_TimerLock );
 		pthread_cond_signal( &pThisInst->m_TimerCond );
@@ -164,6 +162,7 @@ namespace Killer
 
 		while( 1 )
 		{
+			pthread_testcancel( );
 			clock_gettime( CLOCK_REALTIME, &TimeSpec );
 			Second = TimeSpec.tv_sec * 1000000ULL;
 			Microsecond = TimeSpec.tv_nsec / 1000ULL;

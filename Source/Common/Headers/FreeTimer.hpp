@@ -1,5 +1,5 @@
-#ifndef __KILLER_TIMER_HPP__
-#define __KILLER_TIMER_HPP__
+#ifndef __KILLER_FREETIMER_HPP__
+#define __KILLER_FREETIMER_HPP__
 
 #include <DataTypes.hpp>
 #include <pthread.h>
@@ -13,14 +13,14 @@ namespace Killer
 	}BEAT_TIME;
 
 	// The timer holds time in microseconds
-	class Timer
+	class FreeTimer
 	{
 	public:
-		Timer( );
-		~Timer( );
+		FreeTimer( );
+		~FreeTimer( );
 
-		Timer( const Timer &p_Other );
-		Timer &operator=( const Timer &p_Other );
+		FreeTimer( const FreeTimer &p_Other );
+		FreeTimer &operator=( const FreeTimer &p_Other );
 
 		KIL_UINT32 Start( );
 		KIL_UINT32 Stop( );
@@ -51,5 +51,5 @@ namespace Killer
 	KIL_UINT32 GetBeatTime( );
 }
 
-#endif // __KILLER_TIMER_HPP__
+#endif // __KILLER_FREETIMER_HPP__
 

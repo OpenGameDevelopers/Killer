@@ -3,7 +3,8 @@
 
 namespace Killer
 {
-	Keyboard::Keyboard( )
+	Keyboard::Keyboard( ) :
+		m_KeypadFD( -1 )
 	{
 		memset( &m_KeyState, 0, sizeof( m_KeyState ) );
 	}
