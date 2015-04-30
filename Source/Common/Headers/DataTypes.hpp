@@ -1,6 +1,7 @@
 #ifndef __KILLER_DATATYPES_HPP__
 #define __KILLER_DATATYPES_HPP__
 
+#include <stddef.h>
 #include <stdint.h>
 
 typedef signed char		KIL_SCHAR;
@@ -15,6 +16,7 @@ typedef int64_t			KIL_SINT64;
 typedef uint64_t		KIL_UINT64;
 typedef float			KIL_FLOAT32;
 typedef double			KIL_FLOAT64;
+typedef size_t			KIL_MEMSIZE;
 
 typedef KIL_UCHAR	KIL_BYTE;
 typedef KIL_UINT32	KIL_BOOL;

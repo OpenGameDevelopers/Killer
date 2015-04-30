@@ -15,6 +15,13 @@ namespace Killer
 			const KIL_FLOAT32 p_Z );
 		Vector3 &operator=( const Vector3 &p_Other );
 
+		void Set( const KIL_FLOAT32 p_X, const KIL_FLOAT32 p_Y,
+			const KIL_FLOAT32 p_Z );
+
+		KIL_FLOAT32 GetX( ) const;
+		KIL_FLOAT32 GetY( ) const;
+		KIL_FLOAT32 GetZ( ) const;
+
 		KIL_FLOAT32 Magnitude( ) const;
 		KIL_FLOAT32 MagnitudeSq( ) const;
 
@@ -30,6 +37,10 @@ namespace Killer
 		Vector3 Cross( const Vector3 &p_Other ) const;
 
 		void Print( ) const;
+
+		Vector3 &operator-( );
+
+		Vector3 operator-( const Vector3 &p_Other ) const;
 
 	private:
 		KIL_FLOAT32	m_X;
