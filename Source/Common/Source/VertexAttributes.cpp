@@ -8,20 +8,28 @@ namespace Killer
 		m_MaximumVertexAttributes( p_MaximumVertexAttributes ),
 		m_AttributeCount( 0 )
 	{
-		memset( m_Attributes, 0, sizeof( m_Attributes ) );
+		m_pAttributes = new KIL_UINT8[ m_MaximumVertexAttributes ];
+		memset( m_pAttributes, 0,
+			sizeof( KIL_UINT8 ) * m_MaximumVertexAttributes );
 	}
 
 	VertexAttributes::~VertexAttributes( )
 	{
+		if( m_pAttributes )
+		{
+			delete [ ] m_pAttributes;
+			m_pAttributes = 0;
+		}
 	}
 
 	VertexAttributes::VertexAttributes( const VertexAttributes &p_Other ) :
 		m_MaximumVertexAttributes( p_Other.m_MaximumVertexAttributes ),
 		m_AttributeCount( p_Other.m_AttributeCount )
 	{
-		for( KIL_MEMSIZE i = 0; i < p_Other.m_AttributeCount; ++i )
+		m_pAttributes = new KIL_UINT8[ m_MaximumVertexAttributes ];
+		for( KIL_MEMSIZE i = 0; i < m_AttributeCount; ++i )
 		{
-			m_Attributes[ i ] = p_Other.m_Attributes[ i ];
+			m_pAttributes[ i ] = p_Other.m_pAttributes[ i ];
 		}
 	}
 
@@ -31,9 +39,11 @@ namespace Killer
 		m_MaximumVertexAttributes = p_Other.m_MaximumVertexAttributes;
 		m_AttributeCount = p_Other.m_AttributeCount;
 
+		m_pAttributes = new KIL_UINT8[ m_MaximumVertexAttributes ];
+
 		for( KIL_MEMSIZE i = 0; i < m_AttributeCount; ++i )
 		{
-			m_Attributes[ i ] = p_Other.m_Attributes[ i ];
+			m_pAttributes[ i ] = p_Other.m_pAttributes[ i ];
 		}
 
 		return *this;
@@ -47,7 +57,7 @@ namespace Killer
 			return KIL_FAIL;
 		}
 
-		m_Attributes[ m_AttributeCount ] = p_Type;
+		m_pAttributes[ m_AttributeCount ] = p_Type;
 
 		++m_AttributeCount;
 
@@ -66,7 +76,7 @@ namespace Killer
 		{
 			for( KIL_MEMSIZE i = 0; i < m_AttributeCount; ++i )
 			{
-				p_pAttributes[ i ] = m_Attributes[ i ];
+				p_pAttributes[ i ] = m_pAttributes[ i ];
 			}
 
 			return KIL_OK;

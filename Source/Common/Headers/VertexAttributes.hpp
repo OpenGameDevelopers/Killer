@@ -33,7 +33,7 @@ namespace Killer
 	private:
 		KIL_MEMSIZE m_MaximumVertexAttributes;
 		KIL_MEMSIZE	m_AttributeCount;
-		KIL_UINT8	m_Attributes[ 16 ];
+		KIL_UINT8	*m_pAttributes;
 	};
 }
 
