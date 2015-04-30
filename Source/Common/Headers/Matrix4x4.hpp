@@ -11,6 +11,8 @@ namespace Killer
 	public:
 		Matrix4x4( );
 		~Matrix4x4( );
+		Matrix4x4( const Matrix4x4 &p_Other );
+		Matrix4x4 &operator=( const Matrix4x4 &p_Other );
 
 		void Identity( );
 

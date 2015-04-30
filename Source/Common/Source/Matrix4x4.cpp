@@ -1,4 +1,5 @@
 #include <Matrix4x4.hpp>
+#include <cstring>
 
 namespace Killer
 {
@@ -9,6 +10,13 @@ namespace Killer
 
 	Matrix4x4::~Matrix4x4( )
 	{
+	}
+
+	Matrix4x4 &Matrix4x4::operator=( const Matrix4x4 &p_Other )
+	{
+		memcpy( &m_M, &p_Other.m_M, sizeof( m_M ) );
+
+		return *this;
 	}
 
 	void Matrix4x4::Identity( )
