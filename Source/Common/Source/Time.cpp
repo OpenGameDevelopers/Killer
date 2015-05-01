@@ -19,6 +19,11 @@ namespace Killer
 		KIL_FLOAT32 BeatTime = ( Second + ( Minute * 60.0f ) +
 			( ( Hour + 1.0f ) * 3600.0f ) ) / 86.4f;
 
+		if( BeatTime > 1000.0f )
+		{
+			BeatTime -= 1000.0f;
+		}
+
 		p_BeatTime.Beat = BeatTime;
 		p_BeatTime.CentiBeat = fmod( BeatTime, 1.0f ) * 100.0f;
 

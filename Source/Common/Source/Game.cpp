@@ -1,5 +1,6 @@
 #include <Game.hpp>
 #include <iostream>
+#include <iomanip>
 #include <Vector3.hpp>
 #include <FreeTimer.hpp>
 #include <Timer.hpp>
@@ -96,8 +97,8 @@ namespace Killer
 				BEAT_TIME BeatTime;
 				GetBeatTime( BeatTime );
 
-				std::cout << "@" << BeatTime.Beat << "." <<
-					BeatTime.CentiBeat << std::endl;
+				std::cout << "@" << std::setfill( '0' ) << std::setw( 3 ) <<
+					BeatTime.Beat << "." << BeatTime.CentiBeat << std::endl;
 
 				Clock.Stop( );
 				Clock.Start( );

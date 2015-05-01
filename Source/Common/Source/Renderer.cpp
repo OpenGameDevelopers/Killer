@@ -1,6 +1,7 @@
 #include <Renderer.hpp>
 #include <GameWindow.hpp>
 #include <GLES2/gl2.h>
+#include <GLESExtender.hpp>
 #include <iostream>
 
 namespace Killer
@@ -36,6 +37,14 @@ namespace Killer
 			return KIL_FAIL;
 		}
 
+		if( InitialiseGLES2Extensions( ) != KIL_OK )
+		{
+			std::cout << "[Killer::Renderer::Initialise] <ERROR> "
+				"Failed to initialise OpenGL | ES 2.0 extensions" << std::endl;
+
+			return KIL_FAIL;
+		}
+
 		std::cout << "[Killer::Renderer::Initialise] <INFO> GLES Vendor: " <<
 			glGetString( GL_VENDOR ) << std::endl;
 		std::cout << "[Killer::Renderer::Initialise] <INFO> GLES Renderer: " <<
@@ -45,6 +54,43 @@ namespace Killer
 		std::cout << "[Killer::Renderer::Initialise] <INFO> GLES GLSL "
 			"Version: " << glGetString( GL_SHADING_LANGUAGE_VERSION ) <<
 			std::endl;
+
+		std::cout << "[Killer::Renderer::Initialise] <INFO> Capabilities:" <<
+			std::endl;
+
+		GLint MaxVertexAttribs;
+		GLint MaxUniformVectors;
+		GLint MaxVaryingVectors;
+		GLint MaxVertexTextureImageUnits;
+		GLint MaxCombinedTextureImageUnits;
+		GLint MaxTextureImageUnits;
+		GLint MaxFragmentUniformVectors;
+
+		glGetIntegerv( GL_MAX_VERTEX_ATTRIBS, &MaxVertexAttribs );
+		glGetIntegerv( GL_MAX_VERTEX_UNIFORM_VECTORS, &MaxUniformVectors );
+		glGetIntegerv( GL_MAX_VARYING_VECTORS, &MaxVaryingVectors );
+		glGetIntegerv( GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS,
+			&MaxVertexTextureImageUnits );
+		glGetIntegerv( GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
+			&MaxCombinedTextureImageUnits );
+		glGetIntegerv( GL_MAX_TEXTURE_IMAGE_UNITS, &MaxTextureImageUnits );
+		glGetIntegerv( GL_MAX_FRAGMENT_UNIFORM_VECTORS,
+			&MaxFragmentUniformVectors );
+
+		std::cout << "\tMaximum vertex shader attributes:      " <<
+			MaxVertexAttribs << std::endl;
+		std::cout << "\tMaximum vertex shader uniform vectors: " <<
+			MaxUniformVectors << std::endl;
+		std::cout << "\tMaximum varying vectors:               " <<
+			MaxVaryingVectors << std::endl;
+		std::cout << "\tMaximum vertex texture image units:    " <<
+			MaxVertexTextureImageUnits << std::endl;
+		std::cout << "\tMaximum combined texture image units:  " <<
+			MaxCombinedTextureImageUnits << std::endl;
+		std::cout << "\tMaximum texture image units:           " <<
+			MaxTextureImageUnits <<std::endl;
+		std::cout << "\tMaximum fragment uniform vectors:      " <<
+			MaxFragmentUniformVectors << std::endl;
 
 		return KIL_OK;
 	}

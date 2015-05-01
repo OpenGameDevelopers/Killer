@@ -114,19 +114,19 @@ namespace Killer
 			{
 				return 0;
 			}
-			case VERTEXATTRIBUTE_TYPE_VEC1:
+			case VERTEXATTRIBUTE_TYPE_FLOAT1:
 			{
 				return sizeof( KIL_FLOAT32 );
 			}
-			case VERTEXATTRIBUTE_TYPE_VEC2:
+			case VERTEXATTRIBUTE_TYPE_FLOAT2:
 			{
 				return sizeof( KIL_FLOAT32 ) * 2;
 			}
-			case VERTEXATTRIBUTE_TYPE_VEC3:
+			case VERTEXATTRIBUTE_TYPE_FLOAT3:
 			{
 				return sizeof( KIL_FLOAT32 ) * 3;
 			}
-			case VERTEXATTRIBUTE_TYPE_VEC4:
+			case VERTEXATTRIBUTE_TYPE_FLOAT4:
 			{
 				return sizeof( KIL_FLOAT32 ) * 4;
 			}
@@ -157,19 +157,19 @@ namespace Killer
 			{
 				return 0;
 			}
-			case VERTEXATTRIBUTE_TYPE_VEC1:
+			case VERTEXATTRIBUTE_TYPE_FLOAT1:
 			{
 				return 1;
 			}
-			case VERTEXATTRIBUTE_TYPE_VEC2:
+			case VERTEXATTRIBUTE_TYPE_FLOAT2:
 			{
 				return 2;
 			}
-			case VERTEXATTRIBUTE_TYPE_VEC3:
+			case VERTEXATTRIBUTE_TYPE_FLOAT3:
 			{
 				return 3; 
 			}
-			case VERTEXATTRIBUTE_TYPE_VEC4:
+			case VERTEXATTRIBUTE_TYPE_FLOAT4:
 			case VERTEXATTRIBUTE_TYPE_MAT2X2:
 			{
 				return 4;
@@ -196,10 +196,10 @@ namespace Killer
 			{
 				break;
 			}
-			case VERTEXATTRIBUTE_TYPE_VEC1:
-			case VERTEXATTRIBUTE_TYPE_VEC2:
-			case VERTEXATTRIBUTE_TYPE_VEC3:
-			case VERTEXATTRIBUTE_TYPE_VEC4:
+			case VERTEXATTRIBUTE_TYPE_FLOAT1:
+			case VERTEXATTRIBUTE_TYPE_FLOAT2:
+			case VERTEXATTRIBUTE_TYPE_FLOAT3:
+			case VERTEXATTRIBUTE_TYPE_FLOAT4:
 			case VERTEXATTRIBUTE_TYPE_MAT2X2:
 			case VERTEXATTRIBUTE_TYPE_MAT3X3:
 			case VERTEXATTRIBUTE_TYPE_MAT4X4:
