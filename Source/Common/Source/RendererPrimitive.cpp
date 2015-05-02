@@ -1,7 +1,8 @@
 #include <RendererPrimitive.hpp>
 #include <GLESExtender.hpp>
+#include <iostream>
 
-#define BUFFER_OFFSET( Offset ) ( ( char * ) KIL_NULL + ( Offset ) )
+#define BUFFER_OFFSET( Offset ) ( ( void * ) KIL_NULL + ( Offset ) )
 
 namespace Killer
 {
@@ -81,7 +82,7 @@ namespace Killer
 		glBindBuffer( GL_ARRAY_BUFFER, m_VertexBufferObject );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferObject );
 
-		KIL_MEMSIZE TotalDimension = 0;
+		KIL_MEMSIZE Offset = 0;
 
 		for( KIL_MEMSIZE Index = 0;
 			Index < p_VertexAttributes.GetVertexAttributeCount( ); ++Index )
@@ -97,9 +98,9 @@ namespace Killer
 			Dimension = ConvertVertexAttributeToElementCount( Attribute );
 
 			glVertexAttribPointer( Index, Dimension, Type, GL_FALSE,
-				m_Stride, BUFFER_OFFSET( TypeSize * TotalDimension ) );
+				m_Stride, BUFFER_OFFSET( Offset ) );
 
-			TotalDimension += Dimension;
+			Offset += TypeSize;
 			glEnableVertexAttribArray( Index );
 		}
 
@@ -126,6 +127,11 @@ namespace Killer
 
 			return KIL_FAIL;
 		}
+
+		m_VertexCount = p_VertexCount;
+		m_IndexCount = p_IndexCount;
+
+		glBindVertexArray( 0 );
 
 		return KIL_OK;
 	}

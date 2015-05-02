@@ -1,5 +1,6 @@
 #include <VertexAttributes.hpp>
 #include <cstring>
+#include <iostream>
 
 namespace Killer
 {

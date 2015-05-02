@@ -17,7 +17,7 @@ namespace Killer
 	}
 
 	KIL_UINT32 Shader::AddShaderSource( const SHADER_TYPE p_Type,
-		const char * const *p_pSource )
+		const char *p_pSource )
 	{
 		std::string ShaderTypeName;
 		GLenum ShaderTypeGL;
@@ -45,7 +45,8 @@ namespace Killer
 
 		( *pShader ) = glCreateShader( ShaderTypeGL );
 
-		glShaderSource( ( *pShader ), 1, p_pSource, KIL_NULL );
+		glShaderSource( ( *pShader ), 1, &p_pSource, KIL_NULL );
+
 		glCompileShader( ( *pShader ) );
 
 		GLint Compile;
@@ -59,6 +60,7 @@ namespace Killer
 			if( LogLength > 1 )
 			{
 				char *pLog = new char[ LogLength ];
+				glGetShaderInfoLog( ( *pShader ), LogLength, KIL_NULL, pLog );
 				std::cout << "[Killer::Shader::AddShaderSource] <ERROR> "
 					"Failed to compile " << ShaderTypeName << " shader:" <<
 					std::endl << pLog << std::endl;
@@ -269,9 +271,7 @@ namespace Killer
 	{
 		if( m_Linked == KIL_FALSE )
 		{
-			this->Link( );
-			this->GetConstants( );
-			this->GetAttributes( );
+			this->Activate( );
 		}
 
 		auto Constant = m_ShaderConstants.begin( );
@@ -323,11 +323,6 @@ namespace Killer
 				return KIL_FAIL;
 			}
 
-			if( this->GetAttributes( ) != KIL_OK )
-			{
-				return KIL_FAIL;
-			}
-
 			m_Linked = KIL_TRUE;
 		}
 
@@ -352,6 +347,12 @@ namespace Killer
 
 		glLinkProgram( m_Program );
 
+		this->GetAttributes( );
+		
+		// Re-link to apply the changes from glBindAttribLocation in
+		// GetAttributes
+		glLinkProgram( m_Program );
+
 		GLint Linked;
 		glGetProgramiv( m_Program, GL_LINK_STATUS, &Linked );
 
@@ -367,7 +368,7 @@ namespace Killer
 
 				glGetProgramInfoLog( m_Program, LogLength, KIL_NULL,
 					pLog );
-				std::cout << "[Killer::Shader::Activate] <ERROR> "
+				std::cout << "[Killer::Shader::Link] <ERROR> "
 					"Failed to link shader:" << std::endl << pLog <<
 					std::endl;
 					
@@ -399,7 +400,7 @@ namespace Killer
 
 				glGetProgramInfoLog( m_Program, LogLength, KIL_NULL,
 					pLog );
-				std::cout << "[Killer::Shader::Activate] <ERROR> "
+				std::cout << "[Killer::Shader::Link] <ERROR> "
 					"Shader did not pass validation:" << std::endl <<
 					pLog << std::endl;
 
@@ -534,11 +535,17 @@ namespace Killer
 	KIL_UINT32 Shader::GetAttributes( )
 	{
 		GLint Attributes, AttributeLength;
+
 		glGetProgramiv( m_Program, GL_ACTIVE_ATTRIBUTES, &Attributes );
 		glGetProgramiv( m_Program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH,
 			&AttributeLength );
 
 		m_ShaderAttributes.clear( );
+
+		// This needs to be moved to the vertex shader step, extracting
+		// any attribute <type> <name> so that they are processed in order
+		glBindAttribLocation( m_Program, 0, "Position" );
+		glBindAttribLocation( m_Program, 1, "Colour" );
 
 		for( GLint Attribute = 0; Attribute < Attributes; ++Attribute )
 		{

@@ -7,6 +7,9 @@
 #include <Time.hpp>
 #include <unistd.h>
 #include <locale>
+#include <RendererPrimitive.hpp>
+#include <Shader.hpp>
+#include <VertexAttributes.hpp>
 
 namespace Killer
 {
@@ -55,6 +58,14 @@ namespace Killer
 		return KIL_OK;
 	}
 
+#pragma pack( 1 )
+	struct VERTEX
+	{
+		KIL_FLOAT32 X, Y, Z;
+		KIL_FLOAT32 R, G, B;
+	};
+#pragma pack( )
+
 	KIL_UINT32 Game::Execute( )
 	{
 		std::locale::global( std::locale( "" ) );
@@ -69,6 +80,58 @@ namespace Killer
 		Timer Clock;
 
 		Clock.Start( );
+
+		// Triangle is a position + colour
+		struct VERTEX Triangle[ 3 ] =
+		{
+			/*{ 0.5f, 0.5f, -1.0f, 0.5f, -0.5f, -1.0f },
+			{ -0.5f, -0.5f, -1.0f, 1.0f, 0.0f, 0.0f },
+			{ 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f }*/
+			// Top-right, red
+			{ 0.5f, 0.5f, -1.0f, 1.0f, 0.0f, 0.0f },
+			// Bottom-right, blue
+			{ 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f },
+			// Bottom-left, green
+			{ -0.5f, -0.5f, -1.0f, 0.0f, 1.0f, 0.0f }
+		};
+
+		KIL_UINT16 TriangleIndices[ 3 ] = { 0, 1, 2 };
+
+		VertexAttributes TriangleAttributes(
+			m_Renderer.GetMaximumVertexAttributes( ) );
+
+		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
+		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
+
+		RendererPrimitive TrianglePrimitive;
+
+		TrianglePrimitive.Create( ( KIL_BYTE * )Triangle,
+			( KIL_UINT16 * )TriangleIndices, 3, 3, TriangleAttributes,
+			PRIMITIVE_TYPE_LIST );
+
+		Shader TriangleShader;
+
+		const char *pVertexSource =
+			"attribute vec3 Position;\n"
+			"attribute vec3 Colour;\n"
+			"varying vec4 f_Colour;\n"
+			"void main( )\n"
+			"{\n"
+			"	f_Colour = vec4( Colour, 1.0 );\n"
+			"	gl_Position = vec4( Position, 1.0 );\n"
+			"}\n";
+
+		const char *pFragmentSource =
+			"precision mediump float;\n"
+			"varying vec4 f_Colour;\n"
+			"void main( )\n"
+			"{\n"
+			"	gl_FragColor = f_Colour;\n"
+			"}\n";
+
+		TriangleShader.AddShaderSource( SHADER_TYPE_VERTEX, pVertexSource );
+		TriangleShader.AddShaderSource( SHADER_TYPE_FRAGMENT,
+			pFragmentSource );
 
 		while( !Quit )
 		{
@@ -90,6 +153,11 @@ namespace Killer
 			}
 			
 			m_Renderer.Clear( );
+			if( TriangleShader.Activate( ) != KIL_OK )
+			{
+				Quit = KIL_TRUE;
+			}
+			TrianglePrimitive.Render( );
 			m_Renderer.SwapBuffers( );
 
 			if( Clock.GetSeconds( ) >= 1 )

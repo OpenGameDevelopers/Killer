@@ -58,7 +58,7 @@ namespace Killer
 		~Shader( );
 
 		KIL_UINT32 AddShaderSource( const SHADER_TYPE p_Type,
-			const char * const *p_pSource );
+			const char *p_pSource );
 
 		KIL_UINT32 SetConstantData( const KIL_MEMSIZE p_Index, void *p_pData );
 		KIL_UINT32 SetConstantData( const char *p_pName, void *p_pData );

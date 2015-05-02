@@ -21,6 +21,8 @@ namespace Killer
 		void SetClearColour( const KIL_FLOAT32 p_Red,
 			const KIL_FLOAT32 p_Green, const KIL_FLOAT32 p_Blue );
 
+		KIL_MEMSIZE GetMaximumVertexAttributes( ) const;
+
 	private:
 		EGLDisplay	m_EGLDisplay;
 		EGLSurface	m_EGLSurface;

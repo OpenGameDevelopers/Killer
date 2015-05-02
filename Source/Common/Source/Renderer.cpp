@@ -94,6 +94,8 @@ namespace Killer
 
 		m_MaximumVertexAttributes = MaxVertexAttribs;
 
+		glDisable( GL_DEPTH_TEST );
+
 		return KIL_OK;
 	}
 
@@ -143,6 +145,11 @@ namespace Killer
 		}
 
 		glClearColor( Red, Green, Blue, 1.0f );
+	}
+
+	KIL_MEMSIZE Renderer::GetMaximumVertexAttributes( ) const
+	{
+		return m_MaximumVertexAttributes;
 	}
 }
 
