@@ -24,6 +24,7 @@ namespace Killer
 	private:
 		EGLDisplay	m_EGLDisplay;
 		EGLSurface	m_EGLSurface;
+		KIL_MEMSIZE	m_MaximumVertexAttributes;
 	};
 }
 

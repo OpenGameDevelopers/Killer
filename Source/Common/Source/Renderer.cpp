@@ -92,6 +92,8 @@ namespace Killer
 		std::cout << "\tMaximum fragment uniform vectors:      " <<
 			MaxFragmentUniformVectors << std::endl;
 
+		m_MaximumVertexAttributes = MaxVertexAttribs;
+
 		return KIL_OK;
 	}
 
