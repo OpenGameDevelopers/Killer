@@ -15,7 +15,7 @@ namespace Killer
 		KIL_BOOL Initialised = KIL_FALSE;
 
 		std::cout << "[Killer::InitialiseGLESExtensions] <INFO> "
-			"Binding glGenVertexArraysOES ... ";
+			"Binding glGenVertexArraysOES ...    ";
 
 		Initialised |= ( ( __glGenVertexArrays =
 			( PFNGLGENVERTEXARRAYSOESPROC )eglGetProcAddress(
@@ -23,11 +23,11 @@ namespace Killer
 
 		if( __glGenVertexArrays )
 		{
-			std::cout << "[FAIL]" << std::endl;
+			std::cout << "[ OK ]" << std::endl;
 		}
 		else
 		{
-			std::cout << "[ OK ]" << std::endl;
+			std::cout << "[FAIL]" << std::endl;
 		}
 
 		std::cout << "[Killer::InitialiseGLESExtensions] <INFO> "
@@ -39,15 +39,15 @@ namespace Killer
 
 		if( __glDeleteVertexArrays )
 		{
-			std::cout << "[FAIL]" << std::endl;
+			std::cout << "[ OK ]" << std::endl;
 		}
 		else
 		{
-			std::cout << "[ OK ]" << std::endl;
+			std::cout << "[FAIL]" << std::endl;
 		}
 
 		std::cout << "[Killer::InitialiseGLESExtensions] <INFO> "
-			"Binding glBindVertexArrayOES ... ";
+			"Binding glBindVertexArrayOES ...    ";
 
 		Initialised |= ( ( __glBindVertexArray =
 			( PFNGLBINDVERTEXARRAYOESPROC )eglGetProcAddress(
@@ -55,11 +55,11 @@ namespace Killer
 
 		if( __glBindVertexArray )
 		{
-			std::cout << "[FAIL]" << std::endl;
+			std::cout << "[ OK ]" << std::endl;
 		}
 		else
 		{
-			std::cout << "[ OK ]" << std::endl;
+			std::cout << "[FAIL]" << std::endl;
 		}
 
 		return Initialised ? KIL_FAIL : KIL_OK;
