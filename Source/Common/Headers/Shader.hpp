@@ -49,6 +49,7 @@ namespace Killer
 		std::string				Name;
 		VERTEXATTRIBUTE_TYPE	Type;
 		GLint					ArraySize;
+		GLint					Location;
 	}SHADER_ATTRIBUTE;
 
 	class Shader
@@ -76,12 +77,14 @@ namespace Killer
 		KIL_UINT32 Link( );
 		KIL_UINT32 GetConstants( );
 		KIL_UINT32 GetAttributes( );
+		KIL_UINT32 ExtractAttributesFromSource( const std::string &p_Shader );
 
 		GLuint							m_Program;
 		GLuint							m_VertexShader;
 		GLuint							m_FragmentShader;
 		std::vector< SHADER_CONSTANT >	m_ShaderConstants;
 		std::vector< SHADER_ATTRIBUTE >	m_ShaderAttributes;
+		std::vector< SHADER_ATTRIBUTE >	m_ShaderAttributesExplicit;
 		KIL_BOOL						m_Linked;
 	};
 }

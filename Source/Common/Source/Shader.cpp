@@ -72,6 +72,13 @@ namespace Killer
 			return KIL_FAIL;
 		}
 
+		// Some more processing is required to extract the attributes and
+		// manually set their locations in the shader
+		if( p_Type == SHADER_TYPE_VERTEX )
+		{
+			this->ExtractAttributesFromSource( p_pSource );
+		}
+
 		return KIL_OK;
 	}
 
@@ -318,6 +325,11 @@ namespace Killer
 				return KIL_FAIL;
 			}
 
+			if( this->GetAttributes( ) != KIL_OK )
+			{
+				return KIL_FAIL;
+			}
+
 			if( this->GetConstants( ) != KIL_OK )
 			{
 				return KIL_FAIL;
@@ -347,8 +359,14 @@ namespace Killer
 
 		glLinkProgram( m_Program );
 
-		this->GetAttributes( );
-		
+		for( KIL_MEMSIZE Attribute = 0;
+			Attribute < m_ShaderAttributesExplicit.size( ); ++Attribute )
+		{
+			glBindAttribLocation( m_Program,
+				m_ShaderAttributesExplicit[ Attribute ].Location,
+				m_ShaderAttributesExplicit[ Attribute ].Name.c_str( ) );
+		}
+
 		// Re-link to apply the changes from glBindAttribLocation in
 		// GetAttributes
 		glLinkProgram( m_Program );
@@ -542,11 +560,6 @@ namespace Killer
 
 		m_ShaderAttributes.clear( );
 
-		// This needs to be moved to the vertex shader step, extracting
-		// any attribute <type> <name> so that they are processed in order
-		glBindAttribLocation( m_Program, 0, "Position" );
-		glBindAttribLocation( m_Program, 1, "Colour" );
-
 		for( GLint Attribute = 0; Attribute < Attributes; ++Attribute )
 		{
 			SHADER_ATTRIBUTE ShaderAttribute;
@@ -558,6 +571,9 @@ namespace Killer
 				pAttributeName );
 
 			ShaderAttribute.Name = pAttributeName;
+
+			ShaderAttribute.Location = glGetAttribLocation( m_Program,
+				pAttributeName );
 
 			delete [ ] pAttributeName;
 
@@ -601,6 +617,69 @@ namespace Killer
 			}
 
 			m_ShaderAttributes.push_back( ShaderAttribute );
+		}
+
+		return KIL_OK;
+	}
+
+	KIL_UINT32 Shader::ExtractAttributesFromSource(
+		const std::string &p_Shader )
+	{
+		KIL_MEMSIZE AttributePosition = p_Shader.find( "attribute" );
+
+		GLint AttributeLocation = 0;
+
+		m_ShaderAttributesExplicit.clear( );
+
+		while( AttributePosition != std::string::npos )
+		{
+			KIL_MEMSIZE DelimiterPosition = p_Shader.find_first_of( ",;",
+				AttributePosition );
+
+			if( DelimiterPosition == std::string::npos )
+			{
+				std::cout << "[Killer::Shader::ExtractAttributesFromsource] "
+					"<ERROR> Could not find a delimiter following the "
+					"attribute" << std::endl;
+
+				return KIL_FAIL;
+			}
+
+			// Skip over the type
+			KIL_MEMSIZE NameStart = p_Shader.find_first_of( " \t",
+				AttributePosition );
+			NameStart = p_Shader.find_first_not_of( " \t", NameStart );
+			NameStart = p_Shader.find_first_of( " \t", NameStart );
+			NameStart = p_Shader.find_first_not_of( " \t", NameStart );
+
+			KIL_MEMSIZE NameEnd = p_Shader.find_first_of( " ,[;\t",
+				NameStart );
+
+			KIL_MEMSIZE EndOfLine = p_Shader.find_first_of( ';',
+				NameStart );
+
+			KIL_BOOL DoneProcessing = KIL_FALSE;
+
+			do
+			{
+				std::string AttributeName = p_Shader.substr( NameStart,
+					NameEnd - NameStart );
+				
+				SHADER_ATTRIBUTE Attribute;
+				Attribute.Name = AttributeName;
+				Attribute.Location = AttributeLocation;
+
+				std::cout << "Setting attribute \"" << AttributeName << "\" "
+					"to location " << AttributeLocation << std::endl;
+
+				m_ShaderAttributesExplicit.push_back( Attribute );
+
+				DoneProcessing = KIL_TRUE;
+				++AttributeLocation;
+			}while( DoneProcessing = KIL_FALSE );
+
+			AttributePosition = p_Shader.find( "attribute",
+				DelimiterPosition );
 		}
 
 		return KIL_OK;
