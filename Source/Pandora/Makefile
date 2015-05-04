@@ -12,7 +12,7 @@ SOURCEDIR	= Source ../Common/Source
 
 PROJECT := Killer
 TARGET := $(PROJECT)
-OUTFILE	=	$(TARGETDIR)/$(TARGET)_$(GCCVER)
+OUTFILE	=	$(TARGETDIR)/$(TARGET)
 
 BUILD_PLATFORM	:= PANDORA
 BUILD_ARCH		:= ARM
@@ -43,7 +43,7 @@ INCPATH		=
 SYSLPATH	=	
 LIBPATH		=
 SYSLIBS		=	-lEGL -lGLESv2 -lrt -pthread -lX11
-LINKFLAGS	=
+LINKFLAGS	=	-Wl,-rpath -Wl,.
 
 ##### Debug #######
 debug:		BUILD		= Debug

@@ -59,4 +59,6 @@ GitVersion.hpp
 *.log
 *.toc
 
+# Pandora #
 .pandora_config
+*.pnd
