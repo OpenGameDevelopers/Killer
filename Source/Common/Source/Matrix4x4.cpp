@@ -27,5 +27,10 @@ namespace Killer
 			m_M[ 8 ] = m_M[ 9 ] = m_M[ 11 ] = m_M[ 12 ] = m_M[ 13 ] =
 			m_M[ 14 ] = 0.0f;
 	}
+
+	void Matrix4x4::AsFloat( KIL_FLOAT32 *p_pMatrix ) const
+	{
+		memcpy( p_pMatrix, m_M, sizeof( m_M ) );
+	}
 }
 

@@ -10,6 +10,7 @@
 #include <RendererPrimitive.hpp>
 #include <Shader.hpp>
 #include <VertexAttributes.hpp>
+#include <Camera.hpp>
 
 namespace Killer
 {
@@ -88,11 +89,11 @@ namespace Killer
 			{ -0.5f, -0.5f, -1.0f, 1.0f, 0.0f, 0.0f },
 			{ 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f }*/
 			// Top-right, red
-			{ 0.5f, 0.5f, -1.0f, 1.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f },
 			// Bottom-right, blue
-			{ 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f },
+			{ 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f },
 			// Bottom-left, green
-			{ -0.5f, -0.5f, -1.0f, 0.0f, 1.0f, 0.0f }
+			{ -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f }
 		};
 
 		KIL_UINT16 TriangleIndices[ 3 ] = { 0, 1, 2 };
@@ -114,11 +115,13 @@ namespace Killer
 		const char *pVertexSource =
 			"attribute vec3 Position;\n"
 			"attribute vec3 Colour;\n"
+			"uniform mat4 View;\n"
+			"uniform mat4 Projection;\n"
 			"varying vec4 f_Colour;\n"
 			"void main( )\n"
 			"{\n"
 			"	f_Colour = vec4( Colour, 1.0 );\n"
-			"	gl_Position = vec4( Position, 1.0 );\n"
+			"	gl_Position = vec4( Position, 1.0 ) * View * Projection;\n"
 			"}\n";
 
 		const char *pFragmentSource =
@@ -132,6 +135,38 @@ namespace Killer
 		TriangleShader.AddShaderSource( SHADER_TYPE_VERTEX, pVertexSource );
 		TriangleShader.AddShaderSource( SHADER_TYPE_FRAGMENT,
 			pFragmentSource );
+
+		Camera TestCamera;
+
+		TestCamera.SetClippingPlanes( 1.0f, 100000.0f );
+		TestCamera.SetPosition( 0.0f, 0.0f, 100.0f );
+		TestCamera.SetLookPoint( 0.0f, 0.0f, -1.0f );
+		TestCamera.SetWorldUp( 0.0f, 1.0f, 0.0f );
+		TestCamera.SetAspectRatio( 800.0f / 480.0f );
+		TestCamera.SetProjectionMode( PROJECTIONMODE_PERSPECTIVE );
+
+		TestCamera.CalculateProjectionMatrix( );
+		TestCamera.CalculateViewMatrix( );
+
+		Matrix4x4 Projection;
+		Matrix4x4 View;
+
+		TestCamera.GetProjectionMatrix( Projection );
+		TestCamera.GetViewMatrix( View );
+
+		KIL_FLOAT32 ProjectionRaw[ 16 ];
+		KIL_FLOAT32 ViewRaw[ 16 ];
+
+		Projection.AsFloat( ProjectionRaw );
+		View.AsFloat( ViewRaw );
+
+		TriangleShader.SetConstantData( "Projection", ProjectionRaw );
+		TriangleShader.SetConstantData( "View", ViewRaw );
+
+		KIL_FLOAT32 ZPosition, ZInc;
+
+		ZPosition = 100.0f;
+		ZInc = 1.0f;
 
 		while( !Quit )
 		{
@@ -157,6 +192,12 @@ namespace Killer
 			{
 				Quit = KIL_TRUE;
 			}
+			TestCamera.SetPosition( 0.0f, 0.0f, ZPosition );
+			TestCamera.CalculateViewMatrix( );
+			TestCamera.GetViewMatrix( View );
+			View.AsFloat( ViewRaw );
+			TriangleShader.SetConstantData( "View", ViewRaw );
+
 			TrianglePrimitive.Render( );
 			m_Renderer.SwapBuffers( );
 
@@ -166,11 +207,24 @@ namespace Killer
 				GetBeatTime( BeatTime );
 
 				std::cout << "@" << std::setfill( '0' ) << std::setw( 3 ) <<
-					BeatTime.Beat << "." << BeatTime.CentiBeat << std::endl;
+					BeatTime.Beat << "." << std::setw( 2 ) <<
+					BeatTime.CentiBeat << std::endl;
 
 				Clock.Stop( );
 				Clock.Start( );
 			}
+
+			if( ZPosition > 1000.0f )
+			{
+				ZInc = -1.0f;
+			}
+
+			if( ZPosition < 100.0f )
+			{
+				ZInc = 1.0f;
+			}
+
+			ZPosition += ZInc;
 		}
 
 		GameTimer.Stop( );

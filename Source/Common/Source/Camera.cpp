@@ -167,39 +167,46 @@ namespace Killer
 
 	KIL_UINT32 Camera::CalculateViewMatrix( )
 	{
-		Vector3 Direction = ( m_LookPoint - m_Position );
+		Vector3 Direction = ( m_Position - m_LookPoint );
 		Direction.Normalise( );
 
-		Vector3 Right = Direction.Cross( m_WorldUp );
+		Vector3 Right = m_WorldUp.Cross( Direction );
 		Right.Normalise( );
 
-		Vector3 Up = Right.Cross( Direction );
+		Vector3 Up = Direction.Cross( Right );
 		Up.Normalise( );
 
-		Matrix3x3 Upper3x3;
+		// The translation vector needs to be multiplied by the right, up, and
+		// direction vectors, negated to create an inverse of the translation
+		KIL_FLOAT32 PositionX = -Right.Dot( m_Position );
+		KIL_FLOAT32 PositionY = -Up.Dot( m_Position );
+		KIL_FLOAT32 PositionZ = -Direction.Dot( m_Position );
 
-		Upper3x3.SetColumns( Right, Up, -Direction );
-
-		Vector3 Position = -( Upper3x3 * m_Position );
-
-		m_View( 3, 0 ) = m_View( 3, 1 ) = m_View( 3, 2 ) = 0.0f;
+		// Pre-transpose the matrix, creating the matrix inverse as this is
+		// an orthogonal matrix, resulting in:
+		// R R R 0
+		// U U U 0
+		// D D D 0
+		// P P P 1
+		// R == Right, U == Up, D == Direction, P == Position
+		m_View( 0, 3 ) = m_View( 1, 3 ) = m_View( 2, 3 ) = 0.0f;
 		m_View( 3, 3 ) = 1.0f;
 
 		m_View( 0, 0 ) = Right.GetX( );
-		m_View( 1, 0 ) = Right.GetY( );
-		m_View( 2, 0 ) = Right.GetZ( );
+		m_View( 0, 1 ) = Right.GetY( );
+		m_View( 0, 2 ) = Right.GetZ( );
 
-		m_View( 0, 1 ) = Up.GetX( );
+		m_View( 1, 0 ) = Up.GetX( );
 		m_View( 1, 1 ) = Up.GetY( );
-		m_View( 2, 1 ) = Up.GetZ( );
+		m_View( 1, 2 ) = Up.GetZ( );
 
-		m_View( 0, 2 ) = -Direction.GetX( );
-		m_View( 1, 2 ) = -Direction.GetY( );
-		m_View( 2, 2 ) = -Direction.GetZ( );
-		
-		m_View( 0, 3 ) = Position.GetX( );
-		m_View( 1, 3 ) = Position.GetY( );
-		m_View( 2, 3 ) = Position.GetZ( );
+		m_View( 2, 0 ) = Direction.GetX( );
+		m_View( 2, 1 ) = Direction.GetY( );
+		m_View( 2, 2 ) = Direction.GetZ( );
+
+		m_View( 3, 0 ) = PositionX;
+		m_View( 3, 1 ) = PositionY;
+		m_View( 3, 2 ) = PositionZ;
 
 		return KIL_OK;
 	}

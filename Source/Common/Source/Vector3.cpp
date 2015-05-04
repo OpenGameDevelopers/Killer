@@ -125,28 +125,7 @@ namespace Killer
 
 	KIL_FLOAT32 Vector3::Dot( const Vector3 &p_Other ) const
 	{
-		KIL_FLOAT32 Dot = 0.0f;
-
-		__asm__ __volatile__
-		(
-			// Move this instance's XYZ to d2 and d3
-			"vld1.f32	{ d2, d3 }, [ %1 ]\n\t"
-			// Move the other Vector3's XYZ to d4 and d5
-			"vld1.f32	{ d4, d5 }, [ %2 ]\n\t"
-			// Multiply this XY by the other XY
-			"vmul.f32	d0, d2, d4\n\t"
-			// Multiply this Z by the other Z and add to d0
-			"vmla.f32	d0, d4, d5\n\t"
-			// Add the two elements in d0 together
-			"vpadd.f32	d0, d0\n\t"
-			// Move the result into Dot
-			"vmov.f32	%0, s0\n"
-			: "=r" ( Dot )
-			:"r" ( &m_X ), "r" ( &p_Other.m_X )
-			: "d0", "d1", "d2", "d3", "d4", "d5", "memory"
-		);
-
-		return Dot;
+		return ( m_X * p_Other.m_X + m_Y * p_Other.m_Y + m_Z * p_Other.m_Z );
 	}
 
 	Vector3 Vector3::Cross( const Vector3 &p_Other ) const
