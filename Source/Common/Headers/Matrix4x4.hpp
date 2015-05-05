@@ -52,6 +52,8 @@ namespace Killer
 
 		KIL_FLOAT32 Trace( ) const;
 
+		Matrix4x4 operator*( const Matrix4x4 &p_Other ) const;
+
 		// Row-column manipulator
 		inline KIL_FLOAT32 &operator( )( const KIL_MEMSIZE p_Row,
 			const KIL_MEMSIZE p_Column )

@@ -30,8 +30,13 @@ namespace Killer
 	}
 
 	inline KIL_BOOL Equal( KIL_FLOAT32 p_Left, KIL_FLOAT32 p_Right );
+	
 	inline void SinCos( KIL_FLOAT32 p_Angle, KIL_FLOAT32 &p_Sine,
-		KIL_FLOAT32 &p_Cosine );
+		KIL_FLOAT32 &p_Cosine )
+	{
+		p_Sine = sinf( p_Angle );
+		p_Cosine = cosf( p_Angle );
+	}
 }
 
 #endif // __KILLER_ARITHMETIC_HPP__

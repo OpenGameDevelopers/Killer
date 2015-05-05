@@ -12,6 +12,7 @@
 #include <VertexAttributes.hpp>
 #include <Camera.hpp>
 #include <cstring>
+#include <Arithmetic.hpp>
 
 namespace Killer
 {
@@ -106,18 +107,18 @@ namespace Killer
 
 		KIL_UINT16 TriangleIndices[ 36 ] =
 		{
-			0, 1, 2, // FRONT
-			1, 3, 2,
-			1, 4, 3, // RIGHT
-			4, 6, 3,
-			4, 5, 6, // BACK
-			7, 6, 5,
-			5, 0, 2, // LEFT
-			2, 7, 5,
-			7, 2, 3, // BOTTOM
-			3, 6, 7,
-			5, 4, 1, // TOP
-			1, 0, 5
+			0, 2, 3, // FRONT
+			3, 1, 0,
+			1, 3, 6, // RIGHT
+			6, 4, 1,
+			5, 4, 6, // BACK
+			6, 7, 5,
+			2, 0, 5, // LEFT
+			5, 7, 2,
+			2, 7, 3, // BOTTOM
+			7, 6, 3,
+			1, 4, 5, // TOP
+			5, 0, 1
 		};
 
 		VertexAttributes TriangleAttributes(
@@ -139,11 +140,12 @@ namespace Killer
 			"attribute vec3 Colour;\n"
 			"uniform mat4 View;\n"
 			"uniform mat4 Projection;\n"
+			"uniform mat4 World;\n"
 			"varying vec4 f_Colour;\n"
 			"void main( )\n"
 			"{\n"
 			"	f_Colour = vec4( Colour, 1.0 );\n"
-			"	gl_Position = vec4( Position, 1.0 ) * View * Projection;\n"
+			"	gl_Position = vec4( Position, 1.0 ) * World * View * Projection;\n"
 			"}\n";
 
 		const char *pFragmentSource =
@@ -175,8 +177,9 @@ namespace Killer
 		Camera TestCamera;
 
 		TestCamera.SetClippingPlanes( 1.0f, 100000.0f );
+		TestCamera.SetFieldOfView( Killer::Pi / 2 );
 		TestCamera.SetPosition( 0.0f, 0.0f, 100.0f );
-		TestCamera.SetLookPoint( 0.0f, 0.0f, -1.0f );
+		TestCamera.SetLookPoint( 0.0f, 0.0f, 0.0f );
 		TestCamera.SetWorldUp( 0.0f, 1.0f, 0.0f );
 		TestCamera.SetAspectRatio( 800.0f / 480.0f );
 		TestCamera.SetProjectionMode( PROJECTIONMODE_PERSPECTIVE );
@@ -215,6 +218,21 @@ namespace Killer
 		KIL_KEY_STATE OldKeyState;
 		m_Keyboard.GetState( &OldKeyState );
 		KIL_BOOL WireframeMode = KIL_FALSE;
+		glEnable( GL_DEPTH_TEST );
+		glEnable( GL_CULL_FACE );
+		glFrontFace( GL_CCW );
+		glCullFace( GL_BACK );
+		KIL_FLOAT32 RotateY = 0.0f;//Killer::Pi / 2.0f;
+		KIL_FLOAT32 RotateX = 0.0f;
+
+		Matrix4x4 CubeWorld;
+		CubeWorld.Identity( );
+		KIL_FLOAT32 CubeWorldRaw[ 16 ];
+		CubeWorld.AsFloat( CubeWorldRaw );
+		TriangleShader.SetConstantData( "World", CubeWorldRaw );
+		WireframeShader.SetConstantData( "World", CubeWorldRaw );
+
+		KIL_FLOAT32 XTrans = 0.0f, YTrans = 0.0f, ZTrans = 0.0f;
 
 		while( !Quit )
 		{
@@ -230,6 +248,7 @@ namespace Killer
 				Quit = KIL_TRUE;
 			}
 
+
 			if( CurrentKeyState.Keys[ KIL_KEY_W ] &&
 				( OldKeyState.Keys[ KIL_KEY_W ] !=
 					CurrentKeyState.Keys[ KIL_KEY_W ] ) )
@@ -241,14 +260,45 @@ namespace Killer
 					TrianglePrimitive.SetPrimitiveType(
 						PRIMITIVE_TYPE_LINE_LOOP );
 					pActiveShader = &WireframeShader;
+					glDisable( GL_DEPTH_TEST );
+					glDisable( GL_CULL_FACE );
 				}
 				else
 				{
 					TrianglePrimitive.SetPrimitiveType(
 						PRIMITIVE_TYPE_TRIANGLE_LIST );
 					pActiveShader = &TriangleShader;
+					glEnable( GL_DEPTH_TEST );
+					glEnable( GL_CULL_FACE );
 				}
 			}
+
+			RotateY += CurrentGamepadState.AnalogueStick[ 1 ].X * 0.01f;
+			RotateX += CurrentGamepadState.AnalogueStick[ 1 ].Y * 0.01f;
+
+			ZTrans += CurrentGamepadState.AnalogueStick[ 0 ].Y * 0.1f;
+			XTrans += CurrentGamepadState.AnalogueStick[ 0 ].X * 0.1f;
+
+			if( CurrentGamepadState.Buttons & GAMEPAD_BUTTON_L )
+			{
+				YTrans += 0.01f;
+			}
+			if( CurrentGamepadState.Buttons & GAMEPAD_BUTTON_R )
+			{
+				YTrans -= 0.01f;
+			}
+
+			Vector3 CubeTranslation( XTrans, YTrans, ZTrans );
+
+			Matrix4x4 RotateXMatrix, RotateYMatrix, TranslationMatrix;
+			RotateXMatrix.RotateX( RotateX );
+			RotateYMatrix.RotateY( RotateY );
+			TranslationMatrix.Translate( CubeTranslation );
+
+			CubeWorld = ( RotateYMatrix * RotateXMatrix ) *  TranslationMatrix;
+			CubeWorld.AsFloat( CubeWorldRaw );
+
+			pActiveShader->SetConstantData( "World", CubeWorldRaw );
 
 			if( CurrentGamepadState.Buttons & GAMEPAD_BUTTON_START )
 			{
@@ -256,10 +306,7 @@ namespace Killer
 			}
 			
 			m_Renderer.Clear( );
-			if( pActiveShader->Activate( ) != KIL_OK )
-			{
-				Quit = KIL_TRUE;
-			}
+			pActiveShader->Activate( );
 			TestCamera.SetPosition( 0.0f, 0.0f, ZPosition );
 			TestCamera.CalculateViewMatrix( );
 			TestCamera.GetViewMatrix( View );

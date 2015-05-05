@@ -94,8 +94,6 @@ namespace Killer
 
 		m_MaximumVertexAttributes = MaxVertexAttribs;
 
-		glDisable( GL_DEPTH_TEST );
-
 		return KIL_OK;
 	}
 

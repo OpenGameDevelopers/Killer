@@ -154,7 +154,7 @@ namespace Killer
 				m_Projection( 0, 0 ) = D / m_AspectRatio;
 				m_Projection( 1, 1 ) = D;
 				m_Projection( 2, 2 ) = ( m_Near + m_Far ) * Reciprocal;
-				m_Projection( 2, 3 ) = 2 * m_Near * m_Far * Reciprocal;
+				m_Projection( 2, 3 ) = ( 2 * m_Near * m_Far ) * Reciprocal;
 				m_Projection( 3, 2 ) = -1.0f;
 				m_Projection( 3, 3 ) = 0.0f;
 
