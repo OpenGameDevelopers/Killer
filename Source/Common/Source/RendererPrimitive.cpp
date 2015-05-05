@@ -16,7 +16,8 @@ namespace Killer
 		m_GLType( GL_INVALID_ENUM ),
 		m_VertexBufferObject( 0 ),
 		m_IndexBufferObject( 0 ),
-		m_VertexArrayObject( 0 )
+		m_VertexArrayObject( 0 ),
+		m_DrawWireframe( KIL_FALSE )
 	{
 	}
 
@@ -219,7 +220,14 @@ namespace Killer
 			return KIL_FAIL;
 		}
 
+		m_Type = p_Type;
+
 		return KIL_OK;
+	}
+
+	void RendererPrimitive::ToggleWireframe( )
+	{
+		m_DrawWireframe = !m_DrawWireframe;
 	}
 
 	KIL_UINT32 RendererPrimitive::Render( )
@@ -232,9 +240,20 @@ namespace Killer
 		glBindVertexArray( m_VertexArrayObject );
 		glBindBuffer( GL_ARRAY_BUFFER, m_VertexBufferObject );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferObject );
-
-		glDrawElements( m_GLType, m_IndexCount, GL_UNSIGNED_SHORT,
-			BUFFER_OFFSET( 0 ) );
+		
+		if( m_DrawWireframe )
+		{
+			for( KIL_MEMSIZE Index = 0; Index < m_IndexCount; Index += 3 )
+			{
+				glDrawElements( GL_LINE_LOOP, 3, GL_UNSIGNED_SHORT,
+					BUFFER_OFFSET( Index * sizeof( GLushort ) ) );
+			}
+		}
+		else
+		{
+			glDrawElements( m_GLType, m_IndexCount, GL_UNSIGNED_SHORT,
+				BUFFER_OFFSET( 0 ) );
+		}
 
 		return KIL_OK;
 	}

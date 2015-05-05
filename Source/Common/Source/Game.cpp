@@ -88,35 +88,35 @@ namespace Killer
 		struct VERTEX Triangle[ 8 ] =
 		{
 			// Top-Left, white (FRONT)
-			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },	// 0
 			// Top-right, red (FRONT)
-			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },		// 1
 			// Bottom-left, green (FRONT)
-			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f },
+			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f },	// 2
 			// Bottom-right, blue (FRONT)
-			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },	// 3
 			// Top-right, yellow (BACK)
-			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f },
+			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f },	// 4
 			// Top-left, black (BACK)
-			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f },
+			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f },	// 5
 			// Bottom-right, cyan (BACK)
-			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f },
+			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f },	// 6
 			// Bottom-left, magenta (BACK)
-			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f }
+			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f }	// 7
 		};
 
 		KIL_UINT16 TriangleIndices[ 36 ] =
 		{
-			0, 2, 3, // FRONT
-			3, 1, 0,
+			0, 2, 1, // FRONT
+			1, 2, 3,
 			1, 3, 6, // RIGHT
-			6, 4, 1,
+			1, 6, 4,
 			5, 4, 6, // BACK
 			6, 7, 5,
-			2, 0, 5, // LEFT
-			5, 7, 2,
-			2, 7, 3, // BOTTOM
-			7, 6, 3,
+			0, 7, 2, // LEFT
+			0, 5, 7,
+			2, 7, 6, // BOTTOM
+			6, 3, 2,
 			1, 4, 5, // TOP
 			5, 0, 1
 		};
@@ -233,7 +233,7 @@ namespace Killer
 		WireframeShader.SetConstantData( "World", CubeWorldRaw );
 
 		KIL_FLOAT32 XTrans = 0.0f, YTrans = 0.0f, ZTrans = 0.0f;
-
+		
 		while( !Quit )
 		{
 			m_Window.ProcessEvents( );
@@ -257,19 +257,23 @@ namespace Killer
 
 				if( WireframeMode )
 				{
-					TrianglePrimitive.SetPrimitiveType(
-						PRIMITIVE_TYPE_LINE_LOOP );
+					/*TrianglePrimitive.SetPrimitiveType(
+						PRIMITIVE_TYPE_LINE_LOOP );*/
 					pActiveShader = &WireframeShader;
 					glDisable( GL_DEPTH_TEST );
 					glDisable( GL_CULL_FACE );
+
+					TrianglePrimitive.ToggleWireframe( );
 				}
 				else
 				{
-					TrianglePrimitive.SetPrimitiveType(
-						PRIMITIVE_TYPE_TRIANGLE_LIST );
+					/*TrianglePrimitive.SetPrimitiveType(
+						PRIMITIVE_TYPE_TRIANGLE_LIST );*/
 					pActiveShader = &TriangleShader;
 					glEnable( GL_DEPTH_TEST );
 					glEnable( GL_CULL_FACE );
+
+					TrianglePrimitive.ToggleWireframe( );
 				}
 			}
 

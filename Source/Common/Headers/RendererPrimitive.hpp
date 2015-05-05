@@ -34,6 +34,8 @@ namespace Killer
 
 		KIL_UINT32 SetPrimitiveType( const PRIMITIVE_TYPE p_Type );
 
+		void ToggleWireframe( );
+
 		KIL_UINT32 Render( );
 
 	private:
@@ -50,6 +52,8 @@ namespace Killer
 		GLuint			m_VertexBufferObject;
 		GLuint			m_IndexBufferObject;
 		GLuint			m_VertexArrayObject;
+
+		KIL_BOOL		m_DrawWireframe;
 	};
 }
 
