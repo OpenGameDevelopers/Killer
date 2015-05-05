@@ -11,35 +11,35 @@ namespace Killer
     static KIL_UINT32 s_ScanToKey[ 512 ] =
     {
 		// 0
-	    0, KEY_ESCAPE, KEY_1, KEY_2, KEY_3, KEY_4,
-			KEY_5, KEY_6,
+	    0, KIL_KEY_ESCAPE, KIL_KEY_1, KIL_KEY_2, KIL_KEY_3, KIL_KEY_4,
+			KIL_KEY_5, KIL_KEY_6,
 		// 8
-	    KEY_7, KEY_8, KEY_9, KEY_0, 0, 0, 0, 0,
+	    KIL_KEY_7, KIL_KEY_8, KIL_KEY_9, KIL_KEY_0, 0, 0, 0, 0,
 		// 16
-		KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y,
-			KEY_U, KEY_I,
+		KIL_KEY_Q, KIL_KEY_W, KIL_KEY_E, KIL_KEY_R, KIL_KEY_T, KIL_KEY_Y,
+			KIL_KEY_U, KIL_KEY_I,
 		// 24
-	    KEY_O, KEY_P, 0, 0, KEY_ENTER, 0, KEY_A,
-			KEY_S,
+	    KIL_KEY_O, KIL_KEY_P, 0, 0, KIL_KEY_ENTER, 0, KIL_KEY_A,
+			KIL_KEY_S,
 		// 32
-	    KEY_D, KEY_F, KEY_G, KEY_H, KEY_J, KEY_K,
-			KEY_L, 0,
+	    KIL_KEY_D, KIL_KEY_F, KIL_KEY_G, KIL_KEY_H, KIL_KEY_J, KIL_KEY_K,
+			KIL_KEY_L, 0,
 		// 40
-	    0, 0, 0, 0, KEY_Z, KEY_X, KEY_C, KEY_V,
+	    0, 0, 0, 0, KIL_KEY_Z, KIL_KEY_X, KIL_KEY_C, KIL_KEY_V,
 		// 48
-		KEY_B, KEY_N, KEY_M, 0, 0, 0, 0, 0,
+		KIL_KEY_B, KIL_KEY_N, KIL_KEY_M, 0, 0, 0, 0, 0,
 		// 56
-	    0, KEY_SPACE, 0, KEY_F1, KEY_F2, KEY_F3,
-			KEY_F4, KEY_F5,
+	    0, KIL_KEY_SPACE, 0, KIL_KEY_F1, KIL_KEY_F2, KIL_KEY_F3,
+			KIL_KEY_F4, KIL_KEY_F5,
 		// 64
-		KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, 0, 0,
+		KIL_KEY_F6, KIL_KEY_F7, KIL_KEY_F8, KIL_KEY_F9, KIL_KEY_F10, 0, 0,
 			0,
 		// 72
 	    0, 0, 0, 0, 0, 0, 0, 0,
 		// 80
-	    0, 0, 0, 0, 0, 0, 0, KEY_F11,
+	    0, 0, 0, 0, 0, 0, 0, KIL_KEY_F11,
 		// 88
-		KEY_F12, 0, 0, 0, 0, 0, 0, 0,
+		KIL_KEY_F12, 0, 0, 0, 0, 0, 0, 0,
 		// 96
 	    0, 0, 0, 0, 0, 0, 0, 0,
 		// 104
@@ -103,7 +103,7 @@ namespace Killer
 		// 456
 	    0, 0, 0, 0, 0, 0, 0, 0,
 		// 464
-	    KEY_FN, 0, 0, 0, 0, 0, 0, 0,
+	    KIL_KEY_FN, 0, 0, 0, 0, 0, 0, 0,
 	    0, 0, 0, 0, 0, 0, 0, 0,
 	    0, 0, 0, 0, 0, 0, 0, 0,
 	    0, 0, 0, 0, 0, 0, 0, 0,

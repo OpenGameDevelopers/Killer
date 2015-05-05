@@ -11,6 +11,7 @@
 #include <Shader.hpp>
 #include <VertexAttributes.hpp>
 #include <Camera.hpp>
+#include <cstring>
 
 namespace Killer
 {
@@ -85,9 +86,6 @@ namespace Killer
 		// Triangle is a position + colour
 		struct VERTEX Triangle[ 3 ] =
 		{
-			/*{ 0.5f, 0.5f, -1.0f, 0.5f, -0.5f, -1.0f },
-			{ -0.5f, -0.5f, -1.0f, 1.0f, 0.0f, 0.0f },
-			{ 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f }*/
 			// Top-right, red
 			{ 1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f },
 			// Bottom-right, blue
@@ -108,7 +106,7 @@ namespace Killer
 
 		TrianglePrimitive.Create( ( KIL_BYTE * )Triangle,
 			( KIL_UINT16 * )TriangleIndices, 3, 3, TriangleAttributes,
-			PRIMITIVE_TYPE_LIST );
+			PRIMITIVE_TYPE_TRIANGLE_LIST );
 
 		Shader TriangleShader;
 
@@ -135,6 +133,20 @@ namespace Killer
 		TriangleShader.AddShaderSource( SHADER_TYPE_VERTEX, pVertexSource );
 		TriangleShader.AddShaderSource( SHADER_TYPE_FRAGMENT,
 			pFragmentSource );
+
+		Shader WireframeShader;
+
+		const char *pWireframeFragment =
+			"precision mediump float;\n"
+			"uniform vec4 WireframeColour;\n"
+			"void main( )\n"
+			"{\n"
+			"	gl_FragColor = WireframeColour;\n"
+			"}\n";
+
+		WireframeShader.AddShaderSource( SHADER_TYPE_VERTEX, pVertexSource );
+		WireframeShader.AddShaderSource( SHADER_TYPE_FRAGMENT,
+			pWireframeFragment );
 
 		Camera TestCamera;
 
@@ -163,23 +175,55 @@ namespace Killer
 		TriangleShader.SetConstantData( "Projection", ProjectionRaw );
 		TriangleShader.SetConstantData( "View", ViewRaw );
 
+		WireframeShader.SetConstantData( "Projection", ProjectionRaw );
+		WireframeShader.SetConstantData( "View", ViewRaw );
+
 		KIL_FLOAT32 ZPosition, ZInc;
 
 		ZPosition = 100.0f;
 		ZInc = 1.0f;
 
+		KIL_FLOAT32 WireframeColour [ 4 ] = { 0.0f, 1.0f, 0.0f, 1.0f };
+		WireframeShader.SetConstantData( "WireframeColour", WireframeColour );
+
+		Shader *pActiveShader = &TriangleShader;
+
+		KIL_KEY_STATE OldKeyState;
+		m_Keyboard.GetState( &OldKeyState );
+		KIL_BOOL WireframeMode = KIL_FALSE;
+
 		while( !Quit )
 		{
 			m_Window.ProcessEvents( );
-			KEY_STATE CurrentKeyState;
+			KIL_KEY_STATE CurrentKeyState;
 			GAMEPAD_STATE CurrentGamepadState;
 
 			m_Keyboard.GetState( &CurrentKeyState );
 			m_Gamepad.GetState( &CurrentGamepadState );
 
-			if( CurrentKeyState.Keys[ KEY_ESCAPE ] )
+			if( CurrentKeyState.Keys[ KIL_KEY_ESCAPE ] )
 			{
 				Quit = KIL_TRUE;
+			}
+
+			if( CurrentKeyState.Keys[ KIL_KEY_W ] &&
+				( OldKeyState.Keys[ KIL_KEY_W ] !=
+					CurrentKeyState.Keys[ KIL_KEY_W ] ) )
+			{
+				WireframeMode = !WireframeMode;
+
+				if( WireframeMode )
+				{
+					TrianglePrimitive.SetPrimitiveType(
+						PRIMITIVE_TYPE_LINE_LOOP );
+					pActiveShader = &WireframeShader;
+				}
+				else
+				{
+					TrianglePrimitive.SetPrimitiveType(
+						PRIMITIVE_TYPE_TRIANGLE_LIST );
+					pActiveShader = &TriangleShader;
+				}
 			}
 
 			if( CurrentGamepadState.Buttons & GAMEPAD_BUTTON_START )
@@ -188,7 +232,7 @@ namespace Killer
 			}
 			
 			m_Renderer.Clear( );
-			if( TriangleShader.Activate( ) != KIL_OK )
+			if( pActiveShader->Activate( ) != KIL_OK )
 			{
 				Quit = KIL_TRUE;
 			}
@@ -196,7 +240,7 @@ namespace Killer
 			TestCamera.CalculateViewMatrix( );
 			TestCamera.GetViewMatrix( View );
 			View.AsFloat( ViewRaw );
-			TriangleShader.SetConstantData( "View", ViewRaw );
+			pActiveShader->SetConstantData( "View", ViewRaw );
 
 			TrianglePrimitive.Render( );
 			m_Renderer.SwapBuffers( );
@@ -225,6 +269,8 @@ namespace Killer
 			}
 
 			ZPosition += ZInc;
+
+			memcpy( &OldKeyState, &CurrentKeyState, sizeof( OldKeyState ) );
 		}
 
 		GameTimer.Stop( );

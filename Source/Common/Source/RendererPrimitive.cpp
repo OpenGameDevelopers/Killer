@@ -43,22 +43,40 @@ namespace Killer
 
 		switch( p_Type )
 		{
-			case PRIMITIVE_TYPE_LIST:
+			case PRIMITIVE_TYPE_TRIANGLE_LIST:
 			{
 				m_PolygonCount = p_IndexCount / 3;
 				m_GLType = GL_TRIANGLES;
 				break;
 			}
-			case PRIMITIVE_TYPE_STRIP:
+			case PRIMITIVE_TYPE_TRIANGLE_STRIP:
 			{
 				m_PolygonCount = p_IndexCount - 2;
 				m_GLType = GL_TRIANGLE_STRIP;
 				break;
 			}
-			case PRIMITIVE_TYPE_FAN:
+			case PRIMITIVE_TYPE_TRIANGLE_FAN:
 			{
 				m_PolygonCount = p_IndexCount - 2;
 				m_GLType = GL_TRIANGLE_FAN;
+				break;
+			}
+			case PRIMITIVE_TYPE_LINE_LIST:
+			{
+				m_PolygonCount = p_IndexCount / 2;
+				m_GLType = GL_LINES;
+				break;
+			}
+			case PRIMITIVE_TYPE_LINE_STRIP:
+			{
+				m_PolygonCount = p_IndexCount - 1;
+				m_GLType = GL_LINE_STRIP;
+				break;
+			}
+			case PRIMITIVE_TYPE_LINE_LOOP:
+			{
+				m_PolygonCount = p_IndexCount;
+				m_GLType = GL_LINE_LOOP;
 				break;
 			}
 			case PRIMITIVE_TYPE_UNKNOWN:
@@ -141,6 +159,67 @@ namespace Killer
 		glDeleteBuffers( 1, &m_VertexBufferObject );
 		glDeleteBuffers( 1, &m_IndexBufferObject );
 		glDeleteVertexArrays( 1, &m_VertexArrayObject );
+	}
+
+	KIL_UINT32 RendererPrimitive::SetPrimitiveType(
+		const PRIMITIVE_TYPE p_Type )
+	{
+		m_Type = p_Type;
+
+		KIL_MEMSIZE OldPolygonCount = m_PolygonCount;
+
+		switch( p_Type )
+		{
+			case PRIMITIVE_TYPE_TRIANGLE_LIST:
+			{
+				m_PolygonCount = m_IndexCount / 3;
+				m_GLType = GL_TRIANGLES;
+				break;
+			}
+			case PRIMITIVE_TYPE_TRIANGLE_STRIP:
+			{
+				m_PolygonCount = m_IndexCount - 2;
+				m_GLType = GL_TRIANGLE_STRIP;
+				break;
+			}
+			case PRIMITIVE_TYPE_TRIANGLE_FAN:
+			{
+				m_PolygonCount = m_IndexCount - 2;
+				m_GLType = GL_TRIANGLE_FAN;
+				break;
+			}
+			case PRIMITIVE_TYPE_LINE_LIST:
+			{
+				m_PolygonCount = m_IndexCount / 2;
+				m_GLType = GL_LINES;
+				break;
+			}
+			case PRIMITIVE_TYPE_LINE_STRIP:
+			{
+				m_PolygonCount = m_IndexCount - 1;
+				m_GLType = GL_LINE_STRIP;
+				break;
+			}
+			case PRIMITIVE_TYPE_LINE_LOOP:
+			{
+				m_PolygonCount = m_IndexCount;
+				m_GLType = GL_LINE_LOOP;
+				break;
+			}
+			case PRIMITIVE_TYPE_UNKNOWN:
+			{
+				return KIL_FAIL;
+			}
+		}
+
+		if( m_PolygonCount == 0 )
+		{
+			m_PolygonCount = OldPolygonCount;
+
+			return KIL_FAIL;
+		}
+
+		return KIL_OK;
 	}
 
 	KIL_UINT32 RendererPrimitive::Render( )

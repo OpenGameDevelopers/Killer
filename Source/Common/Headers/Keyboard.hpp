@@ -27,7 +27,7 @@ namespace Killer
 
 	private:
 		int			m_KeypadFD;
-		KEY_STATE	m_KeyState;
+		KIL_KEY_STATE	m_KeyState;
 	};
 }
 
