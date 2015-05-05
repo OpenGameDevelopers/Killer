@@ -84,17 +84,41 @@ namespace Killer
 		Clock.Start( );
 
 		// Triangle is a position + colour
-		struct VERTEX Triangle[ 3 ] =
+		struct VERTEX Triangle[ 8 ] =
 		{
-			// Top-right, red
-			{ 1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f },
-			// Bottom-right, blue
-			{ 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f },
-			// Bottom-left, green
-			{ -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f }
+			// Top-Left, white (FRONT)
+			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+			// Top-right, red (FRONT)
+			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+			// Bottom-left, green (FRONT)
+			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f },
+			// Bottom-right, blue (FRONT)
+			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+			// Top-right, yellow (BACK)
+			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f },
+			// Top-left, black (BACK)
+			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f },
+			// Bottom-right, cyan (BACK)
+			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f },
+			// Bottom-left, magenta (BACK)
+			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f }
 		};
 
-		KIL_UINT16 TriangleIndices[ 3 ] = { 0, 1, 2 };
+		KIL_UINT16 TriangleIndices[ 36 ] =
+		{
+			0, 1, 2, // FRONT
+			1, 3, 2,
+			1, 4, 3, // RIGHT
+			4, 6, 3,
+			4, 5, 6, // BACK
+			7, 6, 5,
+			5, 0, 2, // LEFT
+			2, 7, 5,
+			7, 2, 3, // BOTTOM
+			3, 6, 7,
+			5, 4, 1, // TOP
+			1, 0, 5
+		};
 
 		VertexAttributes TriangleAttributes(
 			m_Renderer.GetMaximumVertexAttributes( ) );
@@ -105,7 +129,7 @@ namespace Killer
 		RendererPrimitive TrianglePrimitive;
 
 		TrianglePrimitive.Create( ( KIL_BYTE * )Triangle,
-			( KIL_UINT16 * )TriangleIndices, 3, 3, TriangleAttributes,
+			( KIL_UINT16 * )TriangleIndices, 8, 36, TriangleAttributes,
 			PRIMITIVE_TYPE_TRIANGLE_LIST );
 
 		Shader TriangleShader;
@@ -258,7 +282,7 @@ namespace Killer
 				Clock.Start( );
 			}
 
-			if( ZPosition > 1000.0f )
+			/*if( ZPosition > 1000.0f )
 			{
 				ZInc = -1.0f;
 			}
@@ -268,7 +292,7 @@ namespace Killer
 				ZInc = 1.0f;
 			}
 
-			ZPosition += ZInc;
+			ZPosition += ZInc;*/
 
 			memcpy( &OldKeyState, &CurrentKeyState, sizeof( OldKeyState ) );
 		}
