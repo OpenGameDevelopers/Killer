@@ -278,7 +278,7 @@ namespace Killer
 
 		Texture TestTexture;
 
-		if( TestTexture.Load( "Test.tga" ) != KIL_OK )
+		if( TestTexture.Load( "Test/Textures/512x512.tga" ) != KIL_OK )
 		{
 			std::cout << "[Killer::Game::Execute] <ERROR> "
 				"Failed to load texture" << std::endl;

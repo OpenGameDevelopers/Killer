@@ -1,6 +1,7 @@
 #include <Texture.hpp>
 #include <iostream>
 #include <cstring>
+#include <GLES2/gl2ext.h>
 
 namespace Killer
 {
@@ -56,7 +57,7 @@ namespace Killer
 
 		KIL_BYTE *pImageData = new KIL_BYTE[ ExpectedImageSize ];
 
-		fread( pImageData, sizeof( KIL_BYTE ), ExpectedImageSize, pFile );
+		fread( pImageData, 1, ExpectedImageSize, pFile );
 
 		fclose( pFile );
 		pFile = KIL_NULL;

@@ -30,8 +30,8 @@ cat > ${ROOTDIR}/Build/PND/Killer_PXML.xml << __EOF__
 		</titles>
 		<version major="${MAJOR}" minor="${MINOR}" release="${REVISION}" build="${BUILD}"/>
 		<descriptions>
-			<description lang="en_US">An arcade-style 3D beat-em-up</description>
-			<description lang="en_GB">An arcade-style 3D beat-em-up</description>
+			<description lang="en_US">An arcade-style 3D beat-'em-up</description>
+			<description lang="en_GB">An arcade-style 3D beat-'em-up</description>
 		</descriptions>
 		<exec command="Killer"/>
 		<author name="Rico Tyrell" email="killer@redringrico.com"/>
@@ -46,6 +46,13 @@ cat > ${ROOTDIR}/Build/PND/Killer_PXML.xml << __EOF__
 	</application>
 </PXML>
 __EOF__
+
+cat > ${ROOTDIR}/Build/PND/powervr.ini << __EOF__
+[default]
+WindowSystem=libpvrPVR2D_FLIPWSEGL.so
+__EOF__
+
+cp -rv ${ROOTDIR}/Content/* ${ROOTDIR}/Build/PND/
 
 cp --preserve=links -rv $PANDORA_SDK/toolchain/arm-none-linux-gnueabi/lib/libstdc++.*so* ${ROOTDIR}/Build/PND/
 rm -rv ${ROOTDIR}/Build/PND/libstdc++.so.6.0.18-gdb.py
