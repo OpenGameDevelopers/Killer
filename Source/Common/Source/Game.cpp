@@ -68,6 +68,7 @@ namespace Killer
 		KIL_FLOAT32 X, Y, Z;
 		KIL_FLOAT32 R, G, B;
 		KIL_FLOAT32 S, T;
+		KIL_FLOAT32 nX, nY, nZ;
 	};
 #pragma pack( )
 
@@ -90,53 +91,53 @@ namespace Killer
 		struct VERTEX Triangle[ 24 ] =
 		{
 			// Top-Left, white (FRONT)
-			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },	// 0
+			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f },	// 0
 			// Top-right, red (FRONT)
-			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f },		// 1
+			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f },		// 1
 			// Bottom-left, green (FRONT)
-			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f },	// 2
+			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f },	// 2
 			// Bottom-right, blue (FRONT)
-			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f },	// 3
+			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f },	// 3
 			// Top-right, yellow (BACK)
-			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f },	// 4
+			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f },	// 4
 			// Top-left, black (BACK)
-			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f },	// 5
+			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f },	// 5
 			// Bottom-right, cyan (BACK)
-			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f },	// 6
+			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f },	// 6
 			// Bottom-left, magenta (BACK)
-			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f },	// 7
+			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f },	// 7
 			// Top-left, red (RIGHT)
-			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f },		// 8
+			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f },		// 8
 			// Top-right, yellow (RIGHT)
-			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f },	// 9
+			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },	// 9
 			// Bottom-right, cyan (RIGHT)
-			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f },	// 10
+			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f },	// 10
 			// Bottom-left, blue (RIGHT)
-			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },	// 11
+			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },	// 11
 			// Top-left, black (LEFT)
-			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f },	// 12
+			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f },	// 12
 			// Top-right, white (LEFT)
-			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },	// 13
+			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f },	// 13
 			// Bottom-right, green (LEFT)
-			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f },	// 14
+			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f },	// 14
 			// Bottom-left, magenta (LEFT)
-			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f },	// 15
+			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f },	// 15
 			// Top-left, black (TOP)
-			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f },	// 16
+			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f },	// 16
 			// Top-right, yellow (TOP)
-			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f },	// 17
+			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f },	// 17
 			// Bottom-right, red (TOP)
-			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f },		// 18
+			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f },		// 18
 			// Bottom-left, white (TOP)
-			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },	// 19
+			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f },	// 19
 			// Top-left, green (BOTTOM)
-			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f },	// 20
+			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f },	// 20
 			// Top-right, blue (BOTTOM) 
-			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f },	// 21
+			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f },	// 21
 			// Bottom-right, cyan (BOTTOM)
-			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f },	// 22
+			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f },	// 22
 			// Bottom-left, magenta (BOTTOM)
-			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f }	// 23
+			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f }	// 23
 		};
 
 		KIL_UINT16 TriangleIndices[ 36 ] =
@@ -158,9 +159,14 @@ namespace Killer
 		VertexAttributes TriangleAttributes(
 			m_Renderer.GetMaximumVertexAttributes( ) );
 
+		// Position
 		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
+		// Colour
 		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
+		// ST
 		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT2 );
+		// Normal
+		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
 
 		RendererPrimitive TrianglePrimitive;
 
@@ -174,15 +180,20 @@ namespace Killer
 			"attribute vec3 Position;\n"
 			"attribute vec3 Colour;\n"
 			"attribute vec2 ST;\n"
+			"attribute vec3 Normal;\n"
 			"uniform mat4 View;\n"
 			"uniform mat4 Projection;\n"
 			"uniform mat4 World;\n"
 			"varying vec4 f_Colour;\n"
 			"varying vec2 f_ST;\n"
+			"varying vec3 f_Normal;\n"
+			"varying vec3 f_Position;\n"
 			"void main( )\n"
 			"{\n"
 			"	f_Colour = vec4( Colour, 1.0 );\n"
 			"	f_ST = ST;\n"
+			"	f_Normal = Normal;\n"
+			"	f_Position = Position;\n"
 			"	gl_Position = vec4( Position, 1.0 ) * World * View * Projection;\n"
 			"}\n";
 
@@ -190,10 +201,23 @@ namespace Killer
 			"precision mediump float;\n"
 			"varying vec4 f_Colour;\n"
 			"varying vec2 f_ST;\n"
+			"varying vec3 f_Normal;\n" 
+			"varying vec3 f_Position;\n"
 			"uniform sampler2D Texture;\n"
+			"uniform vec3 EyePosition;\n"
+			"uniform float Shininess;\n"
 			"void main( )\n"
 			"{\n"
-			"	gl_FragColor = texture2D( Texture, f_ST );\n"// * f_Colour;\n"
+			"	vec3 LightPosition = vec3( 2.0, 3.0, 1.0 );\n"
+			"	vec3 LightColour = vec3( 1.0, 1.0, 1.0 );\n"
+			"	vec3 L = normalize( LightPosition - f_Position );\n"
+			"	float DiffuseLight = max( dot( f_Normal, L ), 0.0 );\n"
+			"	vec3 Diffuse = LightColour * DiffuseLight;\n"
+			"	vec3 V = normalize( EyePosition - f_Position );\n"
+			"	vec3 H = normalize( L + V );\n"
+			"	float SpecularLight = pow( max( dot( f_Normal, H ), 0.0 ), Shininess );\n"
+			"	vec3 Specular = vec3( 1.0, 1.0, 1.0 ) * LightColour * SpecularLight;\n"
+			"	gl_FragColor = texture2D( Texture, f_ST ) * vec4( Diffuse + Specular, 1.0 );\n"// * f_Colour;\n"
 			"}\n";
 
 		TriangleShader.AddShaderSource( SHADER_TYPE_VERTEX, pVertexSource );
@@ -243,6 +267,8 @@ namespace Killer
 		TriangleShader.SetConstantData( "View", ViewRaw );
 		KIL_SINT32 Zero = 0;
 		TriangleShader.SetConstantData( "Texture", &Zero );
+		KIL_FLOAT32 One = 1.0f;
+		TriangleShader.SetConstantData( "Shininess", &One );
 
 		WireframeShader.SetConstantData( "Projection", ProjectionRaw );
 		WireframeShader.SetConstantData( "View", ViewRaw );
@@ -366,6 +392,8 @@ namespace Killer
 			TestCamera.GetViewMatrix( View );
 			View.AsFloat( ViewRaw );
 			pActiveShader->SetConstantData( "View", ViewRaw );
+			KIL_FLOAT32 Position[ 3 ] = { 0.0f, 0.0f, ZPosition };
+			pActiveShader->SetConstantData( "EyePosition", Position );
 
 			TestTexture.Activate( );
 			TrianglePrimitive.Render( );
