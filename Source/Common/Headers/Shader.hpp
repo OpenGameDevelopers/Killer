@@ -73,6 +73,8 @@ namespace Killer
 
 		KIL_UINT32 Activate( );
 
+		KIL_UINT32 GetHash( ) const;
+
 	private:
 		KIL_UINT32 Link( );
 		KIL_UINT32 GetConstants( );
@@ -86,6 +88,8 @@ namespace Killer
 		std::vector< SHADER_ATTRIBUTE >	m_ShaderAttributes;
 		std::vector< SHADER_ATTRIBUTE >	m_ShaderAttributesExplicit;
 		KIL_BOOL						m_Linked;
+
+		KIL_UINT32						m_Hash;
 	};
 }
 

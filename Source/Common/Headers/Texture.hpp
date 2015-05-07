@@ -38,6 +38,8 @@ namespace Killer
 		KIL_UINT32 GetWidth( ) const;
 		KIL_UINT32 GetHeight( ) const;
 
+		KIL_UINT32 GetHash( ) const;
+
 	private:
 		Texture( const Texture &p_Other );
 		Texture &operator=( const Texture &p_Other );
@@ -47,6 +49,8 @@ namespace Killer
 		GLuint		m_TextureID;
 		GLenum		m_TextureUnit;
 		GLenum		m_TextureType;
+
+		KIL_UINT32	m_Hash;
 	};
 }
 

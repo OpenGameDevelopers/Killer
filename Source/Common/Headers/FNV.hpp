@@ -10,7 +10,7 @@ namespace Killer
 
 	KIL_UINT32 HashBufferFNV1a( void *p_pBuffer, const KIL_MEMSIZE p_Length,
 		KIL_UINT32 p_PreviousHash = FNV32_OFFSET );
-	KIL_UINT32 HashStringFNV1a( char *p_pString,
+	KIL_UINT32 HashStringFNV1a( const char *p_pString,
 		KIL_UINT32 p_PreviousHash = FNV32_OFFSET );
 }
 

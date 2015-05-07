@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstring>
 #include <GLES2/gl2ext.h>
+#include <FNV.hpp>
 
 namespace Killer
 {
@@ -9,7 +10,8 @@ namespace Killer
 		m_Width( 0 ),
 		m_Height( 0 ),
 		m_TextureID( 0 ),
-		m_TextureUnit( 0 )
+		m_TextureUnit( 0 ),
+		m_Hash( FNV32_OFFSET )
 	{
 	}
 
@@ -125,6 +127,8 @@ namespace Killer
 
 		delete [ ] pImageData;
 
+		m_Hash = HashStringFNV1a( p_FileName.c_str( ) );
+
 		return KIL_OK;
 	}
 
@@ -134,6 +138,21 @@ namespace Killer
 		glBindTexture( GL_TEXTURE_2D, m_TextureID );
 
 		return KIL_OK;
+	}
+
+	KIL_UINT32 Texture::GetWidth( ) const
+	{
+		return m_Width;
+	}
+
+	KIL_UINT32 Texture::GetHeight( ) const
+	{
+		return m_Height;
+	}
+
+	KIL_UINT32 Texture::GetHash( ) const
+	{
+		return m_Hash;
 	}
 }
 

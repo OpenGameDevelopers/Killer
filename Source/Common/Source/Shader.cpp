@@ -1,6 +1,7 @@
 #include <Shader.hpp>
 #include <iostream>
 #include <cstring>
+#include <FNV.hpp>
 
 namespace Killer
 {
@@ -8,7 +9,8 @@ namespace Killer
 		m_Program( 0 ),
 		m_VertexShader( 0 ),
 		m_FragmentShader( 0 ),
-		m_Linked( KIL_FALSE )
+		m_Linked( KIL_FALSE ),
+		m_Hash( FNV32_OFFSET )
 	{
 	}
 
@@ -78,6 +80,8 @@ namespace Killer
 		{
 			this->ExtractAttributesFromSource( p_pSource );
 		}
+
+		m_Hash = HashStringFNV1a( p_pSource, m_Hash );
 
 		return KIL_OK;
 	}
@@ -347,6 +351,11 @@ namespace Killer
 		glUseProgram( m_Program );
 
 		return KIL_OK;
+	}
+	
+	KIL_UINT32 Shader::GetHash( ) const
+	{
+		return m_Hash;
 	}
 
 	KIL_UINT32 Shader::Link( )

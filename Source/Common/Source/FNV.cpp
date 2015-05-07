@@ -17,9 +17,11 @@ namespace Killer
 		return p_PreviousHash;
 	}
 
-	KIL_UINT32 HashStringFNV1a( char *p_pString, KIL_UINT32 p_PreviousHash )
+	KIL_UINT32 HashStringFNV1a( const char *p_pString,
+		KIL_UINT32 p_PreviousHash )
 	{
-		KIL_BYTE *pString = reinterpret_cast< KIL_BYTE * >( p_pString );
+		const KIL_BYTE *pString =
+			reinterpret_cast< const KIL_BYTE * >( p_pString );
 
 		while( *pString )
 		{
