@@ -220,6 +220,7 @@ namespace Killer
 				break;
 			}
 			case CONSTANT_TYPE_INT1:
+			case CONSTANT_TYPE_SAMPLER_2D:
 			case CONSTANT_TYPE_BOOL1:
 			{
 				glUniform1iv( ( *Constant ).Location, ( *Constant ).ArraySize,
@@ -267,6 +268,11 @@ namespace Killer
 					( *Constant ).ArraySize, GL_FALSE,
 					static_cast< GLfloat * >( p_pData ) );
 				break;
+			}
+			default:
+			{
+				std::cout << "Unknown" << std::endl;
+				return KIL_FAIL;
 			}
 		}
 

@@ -13,6 +13,7 @@
 #include <Camera.hpp>
 #include <cstring>
 #include <Arithmetic.hpp>
+#include <Texture.hpp>
 
 namespace Killer
 {
@@ -66,6 +67,7 @@ namespace Killer
 	{
 		KIL_FLOAT32 X, Y, Z;
 		KIL_FLOAT32 R, G, B;
+		KIL_FLOAT32 S, T;
 	};
 #pragma pack( )
 
@@ -85,40 +87,72 @@ namespace Killer
 		Clock.Start( );
 
 		// Triangle is a position + colour
-		struct VERTEX Triangle[ 8 ] =
+		struct VERTEX Triangle[ 24 ] =
 		{
 			// Top-Left, white (FRONT)
-			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },	// 0
+			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },	// 0
 			// Top-right, red (FRONT)
-			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },		// 1
+			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f },		// 1
 			// Bottom-left, green (FRONT)
-			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f },	// 2
+			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f },	// 2
 			// Bottom-right, blue (FRONT)
-			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },	// 3
+			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f },	// 3
 			// Top-right, yellow (BACK)
-			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f },	// 4
+			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f },	// 4
 			// Top-left, black (BACK)
-			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f },	// 5
+			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f },	// 5
 			// Bottom-right, cyan (BACK)
-			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f },	// 6
+			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f },	// 6
 			// Bottom-left, magenta (BACK)
-			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f }	// 7
+			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f },	// 7
+			// Top-left, red (RIGHT)
+			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f },		// 8
+			// Top-right, yellow (RIGHT)
+			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f },	// 9
+			// Bottom-right, cyan (RIGHT)
+			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f },	// 10
+			// Bottom-left, blue (RIGHT)
+			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },	// 11
+			// Top-left, black (LEFT)
+			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f },	// 12
+			// Top-right, white (LEFT)
+			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },	// 13
+			// Bottom-right, green (LEFT)
+			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f },	// 14
+			// Bottom-left, magenta (LEFT)
+			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f },	// 15
+			// Top-left, black (TOP)
+			{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f },	// 16
+			// Top-right, yellow (TOP)
+			{ 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f },	// 17
+			// Bottom-right, red (TOP)
+			{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f },		// 18
+			// Bottom-left, white (TOP)
+			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },	// 19
+			// Top-left, green (BOTTOM)
+			{ -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f },	// 20
+			// Top-right, blue (BOTTOM) 
+			{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f },	// 21
+			// Bottom-right, cyan (BOTTOM)
+			{ 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f },	// 22
+			// Bottom-left, magenta (BOTTOM)
+			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f }	// 23
 		};
 
 		KIL_UINT16 TriangleIndices[ 36 ] =
 		{
 			0, 2, 1, // FRONT
 			1, 2, 3,
-			1, 3, 6, // RIGHT
-			1, 6, 4,
+			11, 10, 8, // RIGHT
+			9, 8, 10,
 			5, 4, 6, // BACK
 			6, 7, 5,
-			0, 7, 2, // LEFT
-			0, 5, 7,
-			2, 7, 6, // BOTTOM
-			6, 3, 2,
-			1, 4, 5, // TOP
-			5, 0, 1
+			12, 15, 14, // LEFT
+			14, 13, 12,
+			20, 23, 22, // BOTTOM
+			22, 21, 20,
+			16, 19, 18, // TOP
+			18, 17, 16
 		};
 
 		VertexAttributes TriangleAttributes(
@@ -126,11 +160,12 @@ namespace Killer
 
 		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
 		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
+		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT2 );
 
 		RendererPrimitive TrianglePrimitive;
 
 		TrianglePrimitive.Create( ( KIL_BYTE * )Triangle,
-			( KIL_UINT16 * )TriangleIndices, 8, 36, TriangleAttributes,
+			( KIL_UINT16 * )TriangleIndices, 24, 36, TriangleAttributes,
 			PRIMITIVE_TYPE_TRIANGLE_LIST );
 
 		Shader TriangleShader;
@@ -138,22 +173,27 @@ namespace Killer
 		const char *pVertexSource =
 			"attribute vec3 Position;\n"
 			"attribute vec3 Colour;\n"
+			"attribute vec2 ST;\n"
 			"uniform mat4 View;\n"
 			"uniform mat4 Projection;\n"
 			"uniform mat4 World;\n"
 			"varying vec4 f_Colour;\n"
+			"varying vec2 f_ST;\n"
 			"void main( )\n"
 			"{\n"
 			"	f_Colour = vec4( Colour, 1.0 );\n"
+			"	f_ST = ST;\n"
 			"	gl_Position = vec4( Position, 1.0 ) * World * View * Projection;\n"
 			"}\n";
 
 		const char *pFragmentSource =
 			"precision mediump float;\n"
 			"varying vec4 f_Colour;\n"
+			"varying vec2 f_ST;\n"
+			"uniform sampler2D Texture;\n"
 			"void main( )\n"
 			"{\n"
-			"	gl_FragColor = f_Colour;\n"
+			"	gl_FragColor = texture2D( Texture, f_ST );\n"// * f_Colour;\n"
 			"}\n";
 
 		TriangleShader.AddShaderSource( SHADER_TYPE_VERTEX, pVertexSource );
@@ -201,6 +241,8 @@ namespace Killer
 
 		TriangleShader.SetConstantData( "Projection", ProjectionRaw );
 		TriangleShader.SetConstantData( "View", ViewRaw );
+		KIL_SINT32 Zero = 0;
+		TriangleShader.SetConstantData( "Texture", &Zero );
 
 		WireframeShader.SetConstantData( "Projection", ProjectionRaw );
 		WireframeShader.SetConstantData( "View", ViewRaw );
@@ -222,7 +264,7 @@ namespace Killer
 		glEnable( GL_CULL_FACE );
 		glFrontFace( GL_CCW );
 		glCullFace( GL_BACK );
-		KIL_FLOAT32 RotateY = 0.0f;//Killer::Pi / 2.0f;
+		KIL_FLOAT32 RotateY = 0.0f;
 		KIL_FLOAT32 RotateX = 0.0f;
 
 		Matrix4x4 CubeWorld;
@@ -233,6 +275,16 @@ namespace Killer
 		WireframeShader.SetConstantData( "World", CubeWorldRaw );
 
 		KIL_FLOAT32 XTrans = 0.0f, YTrans = 0.0f, ZTrans = 0.0f;
+
+		Texture TestTexture;
+
+		if( TestTexture.Load( "Test.tga" ) != KIL_OK )
+		{
+			std::cout << "[Killer::Game::Execute] <ERROR> "
+				"Failed to load texture" << std::endl;
+
+			return KIL_FAIL;
+		}
 		
 		while( !Quit )
 		{
@@ -257,8 +309,6 @@ namespace Killer
 
 				if( WireframeMode )
 				{
-					/*TrianglePrimitive.SetPrimitiveType(
-						PRIMITIVE_TYPE_LINE_LOOP );*/
 					pActiveShader = &WireframeShader;
 					glDisable( GL_DEPTH_TEST );
 					glDisable( GL_CULL_FACE );
@@ -267,11 +317,11 @@ namespace Killer
 				}
 				else
 				{
-					/*TrianglePrimitive.SetPrimitiveType(
-						PRIMITIVE_TYPE_TRIANGLE_LIST );*/
 					pActiveShader = &TriangleShader;
 					glEnable( GL_DEPTH_TEST );
 					glEnable( GL_CULL_FACE );
+					glFrontFace( GL_CCW );
+					glCullFace( GL_BACK );
 
 					TrianglePrimitive.ToggleWireframe( );
 				}
@@ -317,6 +367,7 @@ namespace Killer
 			View.AsFloat( ViewRaw );
 			pActiveShader->SetConstantData( "View", ViewRaw );
 
+			TestTexture.Activate( );
 			TrianglePrimitive.Render( );
 			m_Renderer.SwapBuffers( );
 
