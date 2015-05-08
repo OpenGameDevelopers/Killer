@@ -14,6 +14,7 @@
 #include <cstring>
 #include <Arithmetic.hpp>
 #include <Texture.hpp>
+#include <Material.hpp>
 
 namespace Killer
 {
@@ -86,6 +87,10 @@ namespace Killer
 		Timer Clock;
 
 		Clock.Start( );
+
+		Material TestMaterial;
+
+		TestMaterial.CreateFromFile( "Test/Materials/Test.material" );
 
 		// Triangle is a position + colour
 		struct VERTEX Triangle[ 24 ] =
