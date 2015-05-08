@@ -11,8 +11,9 @@ namespace Killer
 {
 	typedef enum
 	{
-		SHADER_TYPE_VERTEX,
-		SHADER_TYPE_FRAGMENT
+		SHADER_TYPE_VERTEX = 1,
+		SHADER_TYPE_FRAGMENT,
+		SHADER_TYPE_UNKNOWN
 	}SHADER_TYPE;
 
 	typedef enum

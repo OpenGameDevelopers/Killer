@@ -275,7 +275,6 @@ namespace Killer
 			}
 			default:
 			{
-				std::cout << "Unknown" << std::endl;
 				return KIL_FAIL;
 			}
 		}
@@ -683,9 +682,6 @@ namespace Killer
 				SHADER_ATTRIBUTE Attribute;
 				Attribute.Name = AttributeName;
 				Attribute.Location = AttributeLocation;
-
-				std::cout << "Setting attribute \"" << AttributeName << "\" "
-					"to location " << AttributeLocation << std::endl;
 
 				m_ShaderAttributesExplicit.push_back( Attribute );
 

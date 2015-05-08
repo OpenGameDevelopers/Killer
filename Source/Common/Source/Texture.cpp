@@ -49,11 +49,6 @@ namespace Killer
 
 		fseek( pFile, TargaHeader.IDLength, SEEK_SET );
 
-		std::cout << "Texture information:" << std::endl;
-		std::cout << "\tWidth:  " << TargaHeader.Width << std::endl;
-		std::cout << "\tHeight: " << TargaHeader.Height << std::endl;
-		std::cout << "\tBPP:    " << +TargaHeader.BitsPerPixel << std::endl;
-
 		KIL_MEMSIZE ExpectedImageSize = TargaHeader.Width *
 			TargaHeader.Height * ( TargaHeader.BitsPerPixel / 8 );
 

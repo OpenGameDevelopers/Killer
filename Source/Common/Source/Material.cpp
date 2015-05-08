@@ -1,4 +1,7 @@
 #include <Material.hpp>
+#include <MaterialManager.hpp>
+#include <Shader.hpp>
+#include <Memory.hpp>
 #include <FNV.hpp>
 #include <iostream>
 #include <rapidjson/document.h>
@@ -7,9 +10,11 @@
 
 namespace Killer
 {
-	Material::Material( ) :
+	Material::Material( MaterialManager *p_pMaterialManager ) :
+		m_pMaterialManager( p_pMaterialManager ),
 		m_Hash( FNV32_OFFSET ),
-		m_ShaderHash( FNV32_OFFSET )
+		m_ShaderHash( FNV32_OFFSET ),
+		m_TextureCount( 0 )
 	{
 	}
 
@@ -26,6 +31,9 @@ namespace Killer
 
 			return KIL_FAIL;
 		}
+
+		std::cout << "[Killer::Material::CreateFromFile] <INFO> "
+			"Loading: \"" << p_FileName << "\"" << std::endl;
 
 		FILE *pFile = fopen( p_FileName.c_str( ), "rb" );
 
@@ -51,21 +59,16 @@ namespace Killer
 		rapidjson::Document MaterialFile;
 		MaterialFile.Parse( pSource );
 
-		delete [ ] pSource;
-		pSource = KIL_NULL;
+		SafeDeleteArray< char >( pSource );
+
+		struct MATERIAL_SHADER MaterialShader;
 
 		if( MaterialFile.HasMember( "shader" ) )
 		{
-			std::cout << "[Killer::Material::CreateFromFile] <INFO> "
-				"Found a material shader" << std::endl;
-
 			rapidjson::Value &ShaderRoot = MaterialFile[ "shader" ];
 
 			if( ShaderRoot.HasMember( "source" ) )
 			{
-				std::cout << "[Killer::Material::CreateFromFile] <INFO> "
-					"Found shader source in shader" << std::endl;
-
 				if( ShaderRoot[ "source" ].IsArray( ) == false )
 				{
 					std::cout << "[Killer::Material::CreateFromFile] <ERROR> "
@@ -84,26 +87,32 @@ namespace Killer
 				for( rapidjson::SizeType i = 0; i < ShaderSourceRoot.Size( );
 					++i )
 				{
+					std::string ShaderSource;
+					SHADER_TYPE ShaderType = SHADER_TYPE_UNKNOWN;
+
 					if( ShaderSourceRoot[ i ].HasMember( "type" ) )
 					{
-						std::string ShaderType =
+						std::string ShaderTypeString =
 							ShaderSourceRoot[ i ][ "type" ].GetString( );
 
-						if( ShaderType.compare( "vertex" ) == 0 )
+						if( ShaderTypeString.compare( "vertex" ) == 0 )
 						{
 							std::cout << "[Killer::Material::CreateFromFile] "
 								"<INFO> Found a vertex shader" << std::endl;
+							ShaderType = SHADER_TYPE_VERTEX;
 						}
-						else if( ShaderType.compare( "fragment" ) == 0 )
+						else if( ShaderTypeString.compare( "fragment" ) == 0 )
 						{
 							std::cout << "[Killer::Material::CreateFromFile] "
 								"<INFO> Found a fragment shader" << std::endl;
+							ShaderType = SHADER_TYPE_FRAGMENT;
 						}
 						else
 						{
 							std::cout << "[Killer::Material::CreateFromFile] "
-								"<ERROR> Unrecognised shader type" <<
-								std::endl;
+								"<ERROR> Unrecognised shader type \"" <<
+								ShaderSourceRoot[ i ][ "type" ].GetString( ) <<
+								"\"" << std::endl;
 
 							return KIL_FAIL;
 						}
@@ -121,11 +130,42 @@ namespace Killer
 					{
 						std::cout << "[Killer::Material::CreateFromFile] "
 							"<INFO> Shader is in a file" << std::endl;
+
+						FILE *pShaderFile = fopen(
+							ShaderSourceRoot[ i ][ "path" ].GetString( ),
+							"rb" );
+
+						if( pShaderFile == KIL_NULL )
+						{
+							std::cout << "[Killer::Material::CreateFromFile] "
+								"<ERROR> Failed to open shader for reading" <<
+								std::endl;
+
+							return KIL_FAIL;
+						}
+
+						fseek( pShaderFile, 0L, SEEK_END );
+						KIL_MEMSIZE ShaderLength = ftell( pShaderFile );
+						rewind( pShaderFile );
+
+						char *pShaderSource = new char[ ShaderLength + 1 ];
+						pShaderSource[ ShaderLength ] = '\0';
+
+						fread( pShaderSource, 1, ShaderLength, pShaderFile );
+
+						fclose( pShaderFile );
+
+						ShaderSource.assign( pShaderSource );
+
+						SafeDeleteArray< char >( pShaderSource );
 					}
 					else if( ShaderSourceRoot[ i ].HasMember( "code" ) )
 					{
 						std::cout << "[Killer::Material::CreateFromFile] "
 							"<INFO> Shader is in code form" << std::endl;
+
+						ShaderSource =
+							ShaderSourceRoot[ i ][ "code" ].GetString( );
 					}
 					else
 					{
@@ -134,6 +174,26 @@ namespace Killer
 							"\"code\" member" << std::endl;
 
 						return KIL_FAIL;
+					}
+
+					switch( ShaderType )
+					{
+						case SHADER_TYPE_VERTEX:
+						{
+							MaterialShader.VertexSource = ShaderSource;
+							break;
+						}
+						case SHADER_TYPE_FRAGMENT:
+						{
+							MaterialShader.FragmentSource = ShaderSource;
+							break;
+						}
+						default:
+						{
+							std::cout << "[Killer::Material::CreateFromFile] "
+								"<ERROR> Unknown shader type" << std::endl;
+							return KIL_FAIL;
+						}
 					}
 				}
 			}
@@ -171,12 +231,12 @@ namespace Killer
 						if( TypeString.compare( "albedo" ) == 0 )
 						{
 							std::cout << "[Killer::Material::CreateFromFile] "
-								"<INFO> Albedo texture found" << std::endl;
+								"<INFO> Albedo texture found: \"";
 						}
 						else
 						{
 							std::cout << "[Killer::Material::CreateFromFile] "
-								"<WARN> Unknown texture" << std::endl;
+								"<WARN> Unknown texture: \"" << std::endl;
 						}
 					}
 					else
@@ -199,6 +259,22 @@ namespace Killer
 
 						return KIL_FAIL;
 					}
+
+					std::cout << TextureFile << "\"" << std::endl;
+
+					KIL_UINT32 TextureHash;
+					if( m_pMaterialManager->LoadTexture( TextureFile,
+						TextureHash ) != KIL_OK )
+					{
+						std::cout << "[Killer::Material::CreateFromFile] "
+							"<ERROR> Could not load texture: \"" <<
+							TextureFile << "\"" << std::endl;
+
+						return KIL_FAIL;
+					}
+
+					m_TextureHashes.push_back( TextureHash );
+					++m_TextureCount;
 				}
 			}
 			else
@@ -215,8 +291,7 @@ namespace Killer
 				"No textures found" << std::endl;
 		}
 
-		std::cout << "[Killer::Material::CreateFromFile] <INFO> "
-			"Loaded material" << std::endl;
+		m_pMaterialManager->CreateShader( MaterialShader, m_ShaderHash );
 
 		m_Hash = HashStringFNV1a( p_FileName.c_str( ) );
 
@@ -226,6 +301,36 @@ namespace Killer
 	KIL_UINT32 Material::GetHash( ) const
 	{
 		return m_Hash;
+	}
+
+	KIL_UINT32 Material::GetShaderHash( ) const
+	{
+		return m_ShaderHash;
+	}
+
+	KIL_UINT32 Material::GetTextureHashes(
+		std::vector< KIL_UINT32 > &p_Hashes ) const
+	{
+		if( m_TextureHashes.size( ) == 0 )
+		{
+			std::cout << "[Killer::Material::GetTextureHashes] <WARN> "
+				"No textures present in material" << std::endl;
+
+			return KIL_FAIL;
+		}
+
+		for( KIL_MEMSIZE TextureIndex = 0;
+			TextureIndex < m_TextureHashes.size( ); ++TextureIndex )
+		{
+			p_Hashes.push_back( m_TextureHashes[ TextureIndex ] );
+		}
+
+		return KIL_OK;
+	}
+
+	KIL_MEMSIZE Material::GetTextureCount( ) const
+	{
+		return m_TextureCount;
 	}
 }
 

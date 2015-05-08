@@ -14,7 +14,7 @@
 #include <cstring>
 #include <Arithmetic.hpp>
 #include <Texture.hpp>
-#include <Material.hpp>
+#include <MaterialManager.hpp>
 
 namespace Killer
 {
@@ -88,12 +88,30 @@ namespace Killer
 
 		Clock.Start( );
 
-		Material TestMaterial;
+		MaterialManager MatMan;
 
-		TestMaterial.CreateFromFile( "Test/Materials/Test.material" );
+		KIL_UINT32 TextureMaterial;
+		if( MatMan.CreateMaterial( "Test/Materials/Test.material",
+			TextureMaterial ) != KIL_OK )
+		{
+			std::cout << "[Killer::Game::Execute] <ERROR> "
+				"Failed to create texture material" << std::endl;
 
-		// Triangle is a position + colour
-		struct VERTEX Triangle[ 24 ] =
+			return KIL_FAIL;
+		}
+
+		KIL_UINT32 WireframeMaterial;
+
+		if( MatMan.CreateMaterial( "Test/Materials/Wireframe.material",
+			WireframeMaterial ) != KIL_OK )
+		{
+			std::cout << "[Killer::Game::Execute] <ERROR> "
+				"Failed to create wireframe material" << std::endl;
+
+			return KIL_FAIL;
+		}
+
+		struct VERTEX CubeVertices[ 24 ] =
 		{
 			// Top-Left, white (FRONT)
 			{ -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f },	// 0
@@ -145,7 +163,7 @@ namespace Killer
 			{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f }	// 23
 		};
 
-		KIL_UINT16 TriangleIndices[ 36 ] =
+		KIL_UINT16 CubeIndices[ 36 ] =
 		{
 			0, 2, 1, // FRONT
 			1, 2, 3,
@@ -161,87 +179,23 @@ namespace Killer
 			18, 17, 16
 		};
 
-		VertexAttributes TriangleAttributes(
+		VertexAttributes CubeAttributes(
 			m_Renderer.GetMaximumVertexAttributes( ) );
 
 		// Position
-		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
+		CubeAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
 		// Colour
-		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
+		CubeAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
 		// ST
-		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT2 );
+		CubeAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT2 );
 		// Normal
-		TriangleAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
+		CubeAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
 
-		RendererPrimitive TrianglePrimitive;
+		RendererPrimitive CubePrimitive;
 
-		TrianglePrimitive.Create( ( KIL_BYTE * )Triangle,
-			( KIL_UINT16 * )TriangleIndices, 24, 36, TriangleAttributes,
+		CubePrimitive.Create( ( KIL_BYTE * )CubeVertices,
+			( KIL_UINT16 * )CubeIndices, 24, 36, CubeAttributes,
 			PRIMITIVE_TYPE_TRIANGLE_LIST );
-
-		Shader TriangleShader;
-
-		const char *pVertexSource =
-			"attribute vec3 Position;\n"
-			"attribute vec3 Colour;\n"
-			"attribute vec2 ST;\n"
-			"attribute vec3 Normal;\n"
-			"uniform mat4 View;\n"
-			"uniform mat4 Projection;\n"
-			"uniform mat4 World;\n"
-			"varying vec4 f_Colour;\n"
-			"varying vec2 f_ST;\n"
-			"varying vec3 f_Normal;\n"
-			"varying vec3 f_Position;\n"
-			"void main( )\n"
-			"{\n"
-			"	f_Colour = vec4( Colour, 1.0 );\n"
-			"	f_ST = ST;\n"
-			"	f_Normal = Normal;\n"
-			"	f_Position = Position;\n"
-			"	gl_Position = vec4( Position, 1.0 ) * World * View * Projection;\n"
-			"}\n";
-
-		const char *pFragmentSource =
-			"precision mediump float;\n"
-			"varying vec4 f_Colour;\n"
-			"varying vec2 f_ST;\n"
-			"varying vec3 f_Normal;\n" 
-			"varying vec3 f_Position;\n"
-			"uniform sampler2D Texture;\n"
-			"uniform vec3 EyePosition;\n"
-			"uniform float Shininess;\n"
-			"void main( )\n"
-			"{\n"
-			"	vec3 LightPosition = vec3( 2.0, 3.0, 1.0 );\n"
-			"	vec3 LightColour = vec3( 1.0, 1.0, 1.0 );\n"
-			"	vec3 L = normalize( LightPosition - f_Position );\n"
-			"	float DiffuseLight = max( dot( f_Normal, L ), 0.0 );\n"
-			"	vec3 Diffuse = LightColour * DiffuseLight;\n"
-			"	vec3 V = normalize( EyePosition - f_Position );\n"
-			"	vec3 H = normalize( L + V );\n"
-			"	float SpecularLight = pow( max( dot( f_Normal, H ), 0.0 ), Shininess );\n"
-			"	vec3 Specular = vec3( 1.0, 1.0, 1.0 ) * LightColour * SpecularLight;\n"
-			"	gl_FragColor = texture2D( Texture, f_ST ) * vec4( Diffuse + Specular, 1.0 );\n"// * f_Colour;\n"
-			"}\n";
-
-		TriangleShader.AddShaderSource( SHADER_TYPE_VERTEX, pVertexSource );
-		TriangleShader.AddShaderSource( SHADER_TYPE_FRAGMENT,
-			pFragmentSource );
-
-		Shader WireframeShader;
-
-		const char *pWireframeFragment =
-			"precision mediump float;\n"
-			"uniform vec4 WireframeColour;\n"
-			"void main( )\n"
-			"{\n"
-			"	gl_FragColor = WireframeColour;\n"
-			"}\n";
-
-		WireframeShader.AddShaderSource( SHADER_TYPE_VERTEX, pVertexSource );
-		WireframeShader.AddShaderSource( SHADER_TYPE_FRAGMENT,
-			pWireframeFragment );
 
 		Camera TestCamera;
 
@@ -268,25 +222,27 @@ namespace Killer
 		Projection.AsFloat( ProjectionRaw );
 		View.AsFloat( ViewRaw );
 
-		TriangleShader.SetConstantData( "Projection", ProjectionRaw );
-		TriangleShader.SetConstantData( "View", ViewRaw );
 		KIL_SINT32 Zero = 0;
-		TriangleShader.SetConstantData( "Texture", &Zero );
 		KIL_FLOAT32 One = 1.0f;
-		TriangleShader.SetConstantData( "Shininess", &One );
 
-		WireframeShader.SetConstantData( "Projection", ProjectionRaw );
-		WireframeShader.SetConstantData( "View", ViewRaw );
+		MatMan.SetShaderConstant( TextureMaterial, "Projection",
+			ProjectionRaw );
+		MatMan.SetShaderConstant( TextureMaterial, "View", ViewRaw );
+		MatMan.SetShaderConstant( TextureMaterial, "Texture", &Zero );
+		MatMan.SetShaderConstant( TextureMaterial, "Shininess", &One );
+
+		KIL_FLOAT32 WireframeColour [ 4 ] = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+		MatMan.SetShaderConstant( WireframeMaterial, "Projection",
+			ProjectionRaw );
+		MatMan.SetShaderConstant( WireframeMaterial, "View", ViewRaw );
+		MatMan.SetShaderConstant( WireframeMaterial, "WireframeColour",
+			WireframeColour );
 
 		KIL_FLOAT32 ZPosition, ZInc;
 
 		ZPosition = 100.0f;
 		ZInc = 1.0f;
-
-		KIL_FLOAT32 WireframeColour [ 4 ] = { 0.0f, 1.0f, 0.0f, 1.0f };
-		WireframeShader.SetConstantData( "WireframeColour", WireframeColour );
-
-		Shader *pActiveShader = &TriangleShader;
 
 		KIL_KEY_STATE OldKeyState;
 		m_Keyboard.GetState( &OldKeyState );
@@ -302,20 +258,10 @@ namespace Killer
 		CubeWorld.Identity( );
 		KIL_FLOAT32 CubeWorldRaw[ 16 ];
 		CubeWorld.AsFloat( CubeWorldRaw );
-		TriangleShader.SetConstantData( "World", CubeWorldRaw );
-		WireframeShader.SetConstantData( "World", CubeWorldRaw );
 
 		KIL_FLOAT32 XTrans = 0.0f, YTrans = 0.0f, ZTrans = 0.0f;
 
-		Texture TestTexture;
-
-		if( TestTexture.Load( "Test/Textures/512x512.tga" ) != KIL_OK )
-		{
-			std::cout << "[Killer::Game::Execute] <ERROR> "
-				"Failed to load texture" << std::endl;
-
-			return KIL_FAIL;
-		}
+		KIL_UINT32 ActiveMaterial = TextureMaterial;
 		
 		while( !Quit )
 		{
@@ -331,7 +277,6 @@ namespace Killer
 				Quit = KIL_TRUE;
 			}
 
-
 			if( CurrentKeyState.Keys[ KIL_KEY_W ] &&
 				( OldKeyState.Keys[ KIL_KEY_W ] !=
 					CurrentKeyState.Keys[ KIL_KEY_W ] ) )
@@ -340,21 +285,23 @@ namespace Killer
 
 				if( WireframeMode )
 				{
-					pActiveShader = &WireframeShader;
 					glDisable( GL_DEPTH_TEST );
 					glDisable( GL_CULL_FACE );
 
-					TrianglePrimitive.ToggleWireframe( );
+					CubePrimitive.ToggleWireframe( );
+
+					ActiveMaterial = WireframeMaterial;
 				}
 				else
 				{
-					pActiveShader = &TriangleShader;
 					glEnable( GL_DEPTH_TEST );
 					glEnable( GL_CULL_FACE );
 					glFrontFace( GL_CCW );
 					glCullFace( GL_BACK );
 
-					TrianglePrimitive.ToggleWireframe( );
+					CubePrimitive.ToggleWireframe( );
+
+					ActiveMaterial = TextureMaterial;
 				}
 			}
 
@@ -383,7 +330,7 @@ namespace Killer
 			CubeWorld = ( RotateYMatrix * RotateXMatrix ) *  TranslationMatrix;
 			CubeWorld.AsFloat( CubeWorldRaw );
 
-			pActiveShader->SetConstantData( "World", CubeWorldRaw );
+			MatMan.SetShaderConstant( ActiveMaterial, "World", CubeWorldRaw );
 
 			if( CurrentGamepadState.Buttons & GAMEPAD_BUTTON_START )
 			{
@@ -391,17 +338,22 @@ namespace Killer
 			}
 			
 			m_Renderer.Clear( );
-			pActiveShader->Activate( );
 			TestCamera.SetPosition( 0.0f, 0.0f, ZPosition );
 			TestCamera.CalculateViewMatrix( );
 			TestCamera.GetViewMatrix( View );
 			View.AsFloat( ViewRaw );
-			pActiveShader->SetConstantData( "View", ViewRaw );
+			MatMan.SetShaderConstant( ActiveMaterial, "View", ViewRaw );
 			KIL_FLOAT32 Position[ 3 ] = { 0.0f, 0.0f, ZPosition };
-			pActiveShader->SetConstantData( "EyePosition", Position );
 
-			TestTexture.Activate( );
-			TrianglePrimitive.Render( );
+			if( ActiveMaterial == TextureMaterial )
+			{
+				MatMan.SetShaderConstant( ActiveMaterial, "EyePosition",
+					Position );
+			}
+
+			MatMan.Apply( ActiveMaterial );
+
+			CubePrimitive.Render( );
 			m_Renderer.SwapBuffers( );
 
 			if( Clock.GetSeconds( ) >= 1 )

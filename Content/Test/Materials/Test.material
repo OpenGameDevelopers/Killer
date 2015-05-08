@@ -1,12 +1,12 @@
 {
 	"shader": {
 		"source": [
-			{ "type": "vertex", "path": "Content/Cooked/Shaders/TexturedSimple.vsh" },
-			{ "type": "fragment", "path": "Content/Cooked/Shaders/TexturedSimple.fsh" }
+			{ "type": "vertex", "path": "Test/Shaders/Test.vsh" },
+			{ "type": "fragment", "path": "Test/Shaders/Test.fsh" }
 		]
 	},
 	"texture": [
-		{ "type": "albedo", "path": "Content/Cooked/Textures/Biohazard.tga" }
+		{ "type": "albedo", "path": "Test/Textures/512x512.tga" }
 	]
 }
 
