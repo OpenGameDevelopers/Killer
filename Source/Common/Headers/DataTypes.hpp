@@ -6,7 +6,7 @@
 
 typedef signed char		KIL_SCHAR;
 typedef unsigned char	KIL_UCHAR;
-typedef int8_t			KIL_SCHAR;
+typedef int8_t			KIL_SINT8;
 typedef uint8_t			KIL_UINT8;
 typedef int16_t			KIL_SINT16;
 typedef uint16_t		KIL_UINT16;

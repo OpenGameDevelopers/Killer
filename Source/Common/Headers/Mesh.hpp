@@ -5,25 +5,28 @@
 #include <vector>
 #include <RendererPrimitive.hpp>
 #include <Vector3.hpp>
-#include <Shader.hpp>
 
 namespace Killer
 {
+	class MaterialManager;
+
 	class Mesh
 	{
 	public:
-		Mesh( );
+		Mesh( MaterialManager *p_pMaterialManager );
 		~Mesh( );
 
 		KIL_UINT32 AddPrimitive( RendererPrimitive *p_pPrimitive );
 
-		KIL_UINT32 Render( );
+		KIL_UINT32 SetMaterial( const KIL_UINT32 p_MaterialID );
 
-		KIL_UINT32 SetShader( Shader *p_pShader );
+		KIL_UINT32 Render( );
 
 		KIL_UINT32 SetPosition( const Vector3 &p_Position );
 		KIL_UINT32 SetOrientation( const Vector3 &p_Position );
 		KIL_UINT32 SetScale( const Vector3 &p_Scale );
+
+		void ToggleWireframe( );
 
 	private:
 		Mesh( const Mesh &p_Other );
@@ -31,11 +34,13 @@ namespace Killer
 
 		std::vector< RendererPrimitive * >	m_Primitives;
 
-		Shader	*m_pShader;
-
 		Vector3	m_Position;
 		Vector3	m_Orientation;
 		Vector3	m_Scale;
+
+		KIL_UINT32	m_MaterialHash;
+
+		MaterialManager	*m_pMaterialManager;
 
 		// Need to add a bounding volume
 	};

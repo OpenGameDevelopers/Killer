@@ -1,8 +1,11 @@
 #include <Mesh.hpp>
+#include <MaterialManager.hpp>
+#include <Matrix4x4.hpp>
 
 namespace Killer
 {
-	Mesh::Mesh( )
+	Mesh::Mesh( MaterialManager *p_pMaterialManager ) :
+		m_pMaterialManager( p_pMaterialManager )
 	{
 	}
 
@@ -19,15 +22,15 @@ namespace Killer
 
 	KIL_UINT32 Mesh::Render( )
 	{
-		m_pShader->Activate( );
-
 		KIL_FLOAT32 IdentityMatrix[ 16 ] = 
 		{	1.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f };
 
-		m_pShader->SetConstantData( "WorldMatrix", IdentityMatrix );
+		Matrix4x4 Translation, RotationX, RotationY, RotationZ, Scale;
+
+		//m_pMaterialManager->Apply( m_MaterialHash );
 
 		for( KIL_MEMSIZE Primitive = 0; Primitive < m_Primitives.size( );
 			++Primitive )
@@ -38,9 +41,9 @@ namespace Killer
 		return KIL_OK;
 	}
 
-	KIL_UINT32 Mesh::SetShader( Shader *p_pShader )
+	KIL_UINT32 Mesh::SetMaterial( const KIL_UINT32 p_MaterialHash )
 	{
-		m_pShader = p_pShader;
+		m_MaterialHash = p_MaterialHash;
 
 		return KIL_OK;
 	}
@@ -64,6 +67,15 @@ namespace Killer
 		m_Scale = p_Scale;
 
 		return KIL_OK;
+	}
+
+	void Mesh::ToggleWireframe( )
+	{
+		for( KIL_MEMSIZE Primitive = 0; Primitive < m_Primitives.size( );
+			++Primitive )
+		{
+			m_Primitives[ Primitive ]->ToggleWireframe( );
+		}
 	}
 }
 

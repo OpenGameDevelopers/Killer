@@ -8,13 +8,12 @@
 #include <unistd.h>
 #include <locale>
 #include <RendererPrimitive.hpp>
-#include <Shader.hpp>
 #include <VertexAttributes.hpp>
 #include <Camera.hpp>
 #include <cstring>
 #include <Arithmetic.hpp>
-#include <Texture.hpp>
 #include <MaterialManager.hpp>
+#include <Model.hpp>
 
 namespace Killer
 {
@@ -111,6 +110,16 @@ namespace Killer
 			return KIL_FAIL;
 		}
 
+		Model CubeModel( &MatMan );
+
+		if( CubeModel.Load( "Test/Models/TestModel.killer" ) != KIL_OK )
+		{
+			std::cout << "[Killer::Game::Executable] <ERROR> "
+				"Failed to load model" << std::endl;
+
+			return KIL_FAIL;
+		}
+
 		struct VERTEX CubeVertices[ 24 ] =
 		{
 			// Top-Left, white (FRONT)
@@ -191,11 +200,11 @@ namespace Killer
 		// Normal
 		CubeAttributes.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
 
-		RendererPrimitive CubePrimitive;
+		/*RendererPrimitive CubePrimitive;
 
 		CubePrimitive.Create( ( KIL_BYTE * )CubeVertices,
 			( KIL_UINT16 * )CubeIndices, 24, 36, CubeAttributes,
-			PRIMITIVE_TYPE_TRIANGLE_LIST );
+			PRIMITIVE_TYPE_TRIANGLE_LIST );*/
 
 		Camera TestCamera;
 
@@ -287,8 +296,9 @@ namespace Killer
 				{
 					glDisable( GL_DEPTH_TEST );
 					glDisable( GL_CULL_FACE );
+					CubeModel.ToggleWireframe( );
 
-					CubePrimitive.ToggleWireframe( );
+					//CubePrimitive.ToggleWireframe( );
 
 					ActiveMaterial = WireframeMaterial;
 				}
@@ -299,7 +309,9 @@ namespace Killer
 					glFrontFace( GL_CCW );
 					glCullFace( GL_BACK );
 
-					CubePrimitive.ToggleWireframe( );
+					CubeModel.ToggleWireframe( );
+
+					//CubePrimitive.ToggleWireframe( );
 
 					ActiveMaterial = TextureMaterial;
 				}
@@ -353,7 +365,10 @@ namespace Killer
 
 			MatMan.Apply( ActiveMaterial );
 
-			CubePrimitive.Render( );
+			//CubePrimitive.Render( );
+			
+			CubeModel.Render( );
+
 			m_Renderer.SwapBuffers( );
 
 			if( Clock.GetSeconds( ) >= 1 )
