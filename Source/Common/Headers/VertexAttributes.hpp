@@ -3,6 +3,7 @@
 
 #include <DataTypes.hpp>
 #include <GLES2/gl2.h>
+#include <vector>
 
 namespace Killer
 {
@@ -18,6 +19,23 @@ namespace Killer
 		VERTEXATTRIBUTE_TYPE_MAT4X4,
 	}VERTEXATTRIBUTE_TYPE;
 
+	typedef enum
+	{
+		VERTEXATTRIBUTE_INTENT_UNKNOWN	= 0,
+		VERTEXATTRIBUTE_INTENT_POSITION,
+		VERTEXATTRIBUTE_INTENT_NORMAL,
+		VERTEXATTRIBUTE_INTENT_TEXTURE,
+		VERTEXATTRIBUTE_INTENT_COLOUR,
+		VERTEXATTRIBUTE_INTENT_TANGENT,
+		VERTEXATTRIBUTE_INTENT_BINORMAL
+	}VERTEXATTRIBUTE_INTENT;
+
+	struct VERTEXATTRIBUTE
+	{
+		VERTEXATTRIBUTE_TYPE	Type;
+		VERTEXATTRIBUTE_INTENT	Intent;
+	};
+
 	class VertexAttributes
 	{
 	public:
@@ -27,29 +45,31 @@ namespace Killer
 		VertexAttributes( const VertexAttributes &p_Other );
 		VertexAttributes &operator=( const VertexAttributes &p_Other );
 
-		KIL_UINT32 AddVertexAttribute( VERTEXATTRIBUTE_TYPE p_Type );
+		KIL_UINT32 AddVertexAttribute( VERTEXATTRIBUTE_TYPE p_Type,
+			VERTEXATTRIBUTE_INTENT p_Intent );
 
-		VERTEXATTRIBUTE_TYPE GetAttributeAt( const KIL_MEMSIZE p_Index ) const;
+		struct VERTEXATTRIBUTE GetAttributeAt(
+			const KIL_MEMSIZE p_Index ) const;
 
 		KIL_MEMSIZE GetVertexAttributeCount( ) const;
 		KIL_UINT32 GetVertexAttributes(
-			VERTEXATTRIBUTE_TYPE *p_pAttributes ) const;
+			struct VERTEXATTRIBUTE *p_pAttributes ) const;
 
 		KIL_MEMSIZE GetStride( ) const;
 
 	private:
-		KIL_MEMSIZE 			m_MaximumVertexAttributes;
-		KIL_MEMSIZE				m_AttributeCount;
-		KIL_MEMSIZE				m_Stride;
-		VERTEXATTRIBUTE_TYPE	*m_pAttributes;
+		KIL_MEMSIZE 							m_MaximumVertexAttributes;
+		KIL_MEMSIZE								m_AttributeCount;
+		KIL_MEMSIZE								m_Stride;
+		std::vector< struct VERTEXATTRIBUTE >	m_Attributes;
 	};
 
 	KIL_MEMSIZE ConvertVertexAttributeToSize(
-		const VERTEXATTRIBUTE_TYPE p_Type );
+		const struct VERTEXATTRIBUTE p_Attribute );
 	KIL_MEMSIZE ConvertVertexAttributeToElementCount( 
-		const VERTEXATTRIBUTE_TYPE p_Type );
+		const struct VERTEXATTRIBUTE p_Attribute );
 	GLenum ConvertVertexAttributeToGLenum(
-		const VERTEXATTRIBUTE_TYPE p_Type );
+		const struct VERTEXATTRIBUTE p_Attribute );
 }
 
 #endif // __KILLER_VERTEXATTRIBUTES_HPP__

@@ -39,12 +39,6 @@ namespace Killer
 
 		struct TARGA_HEADER TargaHeader;
 
-		KIL_MEMSIZE TotalFileSize = 0;
-
-		fseek( pFile, 0L, SEEK_END );
-		TotalFileSize = ftell( pFile );
-		rewind( pFile );
-
 		fread( &TargaHeader, sizeof( TargaHeader ), 1, pFile );
 
 		fseek( pFile, TargaHeader.IDLength, SEEK_SET );

@@ -6,6 +6,7 @@
 #include <Mesh.hpp>
 #include <RendererPrimitive.hpp>
 #include <VertexAttributes.hpp>
+#include <Camera.hpp>
 #include <iostream>
 #include <iomanip>
 
@@ -108,11 +109,41 @@ namespace Killer
 		return KIL_OK;
 	}
 
-	KIL_UINT32 Model::Render( )
+	KIL_UINT32 Model::Render( Camera &p_Camera )
 	{
 		for( KIL_MEMSIZE Mesh = 0; Mesh < m_Meshes.size( ); ++Mesh )
 		{
-			m_Meshes[ Mesh ]->Render( );
+			m_Meshes[ Mesh ]->Render( p_Camera );
+		}
+
+		return KIL_OK;
+	}
+
+	KIL_UINT32 Model::SetPosition( const Vector3 &p_Position )
+	{
+		for( KIL_MEMSIZE Mesh = 0; Mesh < m_Meshes.size( ); ++Mesh )
+		{
+			m_Meshes[ Mesh ]->SetPosition( p_Position );
+		}
+
+		return KIL_OK;
+	}
+
+	KIL_UINT32 Model::SetScale( const Vector3 &p_Scale )
+	{
+		for( KIL_MEMSIZE Mesh = 0; Mesh < m_Meshes.size( ); ++Mesh )
+		{
+			m_Meshes[ Mesh ]->SetScale( p_Scale );
+		}
+
+		return KIL_OK;
+	}
+
+	KIL_UINT32 Model::SetOrientation( const Vector3 &p_Orientation )
+	{
+		for( KIL_MEMSIZE Mesh = 0; Mesh < m_Meshes.size( ); ++Mesh )
+		{
+			m_Meshes[ Mesh ]->SetOrientation( p_Orientation );
 		}
 
 		return KIL_OK;
@@ -126,6 +157,24 @@ namespace Killer
 		}
 	}
 
+	void Model::ShowNormals( )
+	{
+		for( KIL_MEMSIZE Mesh = 0; Mesh < m_Meshes.size( ); ++Mesh )
+		{
+			std::cout << "Showing normals for mesh " << Mesh << std::endl;
+			m_Meshes[ Mesh ]->ShowNormals( );
+		}
+	}
+
+	void Model::HideNormals( )
+	{
+		for( KIL_MEMSIZE Mesh = 0; Mesh < m_Meshes.size( ); ++Mesh )
+		{
+			std::cout << "Hiding normals for mesh " << Mesh << std::endl;
+			m_Meshes[ Mesh ]->HideNormals( );
+		}
+	}
+
 	KIL_UINT32 Model::ReadMeshData( FILE *p_pFile )
 	{
 		struct MODEL_MESH ModelMesh;
@@ -136,9 +185,12 @@ namespace Killer
 
 		VertexAttributes VertexAttribs( 8 );
 
-		VertexAttribs.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
-		VertexAttribs.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3 );
-		VertexAttribs.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT2 );
+		VertexAttribs.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3,
+			VERTEXATTRIBUTE_INTENT_POSITION );
+		VertexAttribs.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT3,
+			VERTEXATTRIBUTE_INTENT_NORMAL );
+		VertexAttribs.AddVertexAttribute( VERTEXATTRIBUTE_TYPE_FLOAT2,
+			VERTEXATTRIBUTE_INTENT_TEXTURE );
 
 		fread( pVertices, VertexAttribs.GetStride( ), ModelMesh.VertexCount,
 			p_pFile );

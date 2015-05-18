@@ -38,6 +38,7 @@ namespace Killer
 
 	class Mesh;
 	class MaterialManager;
+	class Camera;
 
 	class Model
 	{
@@ -46,13 +47,16 @@ namespace Killer
 		~Model( );
 
 		KIL_UINT32 Load( const std::string &p_FileName );
-		KIL_UINT32 Render( );
+		KIL_UINT32 Render( Camera &p_Camera );
 
 		KIL_UINT32 SetPosition( const Vector3 &p_Position );
 		KIL_UINT32 SetScale( const Vector3 &p_Scale );
 		KIL_UINT32 SetOrientation( const Vector3 &p_Orientation );
 
 		void ToggleWireframe( );
+
+		void ShowNormals( );
+		void HideNormals( );
 
 	private:
 		Model( const Model &p_Other );

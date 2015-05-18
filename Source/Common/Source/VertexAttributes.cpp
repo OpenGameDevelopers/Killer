@@ -10,18 +10,10 @@ namespace Killer
 		m_AttributeCount( 0 ),
 		m_Stride( 0 )
 	{
-		m_pAttributes = new VERTEXATTRIBUTE_TYPE[ m_MaximumVertexAttributes ];
-		memset( m_pAttributes, 0,
-			sizeof( VERTEXATTRIBUTE_TYPE ) * m_MaximumVertexAttributes );
 	}
 
 	VertexAttributes::~VertexAttributes( )
 	{
-		if( m_pAttributes )
-		{
-			delete [ ] m_pAttributes;
-			m_pAttributes = 0;
-		}
 	}
 
 	VertexAttributes::VertexAttributes( const VertexAttributes &p_Other ) :
@@ -29,10 +21,10 @@ namespace Killer
 		m_AttributeCount( p_Other.m_AttributeCount ),
 		m_Stride( p_Other.m_Stride )
 	{
-		m_pAttributes = new VERTEXATTRIBUTE_TYPE[ m_MaximumVertexAttributes ];
-		for( KIL_MEMSIZE i = 0; i < m_AttributeCount; ++i )
+		for( KIL_MEMSIZE Attribute = 0;
+			Attribute < p_Other.m_Attributes.size( ); ++Attribute )
 		{
-			m_pAttributes[ i ] = p_Other.m_pAttributes[ i ];
+			m_Attributes.push_back( p_Other.m_Attributes[ Attribute ] );
 		}
 	}
 
@@ -43,41 +35,50 @@ namespace Killer
 		m_AttributeCount = p_Other.m_AttributeCount;
 		m_Stride = p_Other.m_Stride;
 
-		m_pAttributes = new VERTEXATTRIBUTE_TYPE[ m_MaximumVertexAttributes ];
-
-		for( KIL_MEMSIZE i = 0; i < m_AttributeCount; ++i )
+		for( KIL_MEMSIZE Attribute = 0;
+			Attribute < p_Other.m_Attributes.size( ); ++Attribute )
 		{
-			m_pAttributes[ i ] = p_Other.m_pAttributes[ i ];
+			m_Attributes.push_back( p_Other.m_Attributes[ Attribute ] );
 		}
 
 		return *this;
 	}
 
 	KIL_UINT32 VertexAttributes::AddVertexAttribute(
-		VERTEXATTRIBUTE_TYPE p_Type )
+		VERTEXATTRIBUTE_TYPE p_Type,
+		VERTEXATTRIBUTE_INTENT p_Intent )
 	{
 		if( m_AttributeCount > m_MaximumVertexAttributes )
 		{
 			return KIL_FAIL;
 		}
 
-		m_pAttributes[ m_AttributeCount ] = p_Type;
-		m_Stride += ConvertVertexAttributeToSize( p_Type );
+		struct VERTEXATTRIBUTE Attribute;
+		Attribute.Type = p_Type;
+		Attribute.Intent = p_Intent;
+
+		m_Attributes.push_back( Attribute );
+		m_Stride += ConvertVertexAttributeToSize( Attribute );
 
 		++m_AttributeCount;
 
 		return KIL_OK;
 	}
 
-	VERTEXATTRIBUTE_TYPE VertexAttributes::GetAttributeAt(
+	struct VERTEXATTRIBUTE VertexAttributes::GetAttributeAt(
 		const KIL_MEMSIZE p_Index ) const
 	{
 		if( p_Index < m_AttributeCount )
 		{
-			return m_pAttributes[ p_Index ];			
+			return m_Attributes[ p_Index ];
 		}
 
-		return VERTEXATTRIBUTE_TYPE_UNKNOWN;
+		struct VERTEXATTRIBUTE Unknown;
+
+		Unknown.Type = VERTEXATTRIBUTE_TYPE_UNKNOWN;
+		Unknown.Intent = VERTEXATTRIBUTE_INTENT_UNKNOWN;
+
+		return Unknown;
 	}
 
 	KIL_MEMSIZE VertexAttributes::GetVertexAttributeCount( ) const
@@ -86,13 +87,13 @@ namespace Killer
 	}
 
 	KIL_UINT32 VertexAttributes::GetVertexAttributes(
-		VERTEXATTRIBUTE_TYPE *p_pAttributes ) const
+		struct VERTEXATTRIBUTE *p_pAttributes ) const
 	{
 		if( p_pAttributes )
 		{
 			for( KIL_MEMSIZE i = 0; i < m_AttributeCount; ++i )
 			{
-				p_pAttributes[ i ] = m_pAttributes[ i ];
+				p_pAttributes[ i ] = m_Attributes[ i ];
 			}
 
 			return KIL_OK;
@@ -107,9 +108,9 @@ namespace Killer
 	}
 
 	KIL_MEMSIZE ConvertVertexAttributeToSize(
-		const VERTEXATTRIBUTE_TYPE p_Type )
+		const VERTEXATTRIBUTE p_Attribute )
 	{
-		switch( p_Type )
+		switch( p_Attribute.Type )
 		{
 			case VERTEXATTRIBUTE_TYPE_UNKNOWN:
 			{
@@ -150,9 +151,9 @@ namespace Killer
 
 
 	KIL_MEMSIZE ConvertVertexAttributeToElementCount( 
-		const VERTEXATTRIBUTE_TYPE p_Type )
+		const struct VERTEXATTRIBUTE p_Attribute )
 	{
-		switch( p_Type )
+		switch( p_Attribute.Type )
 		{
 			case VERTEXATTRIBUTE_TYPE_UNKNOWN:
 			{
@@ -189,9 +190,9 @@ namespace Killer
 	}
 
 	GLenum ConvertVertexAttributeToGLenum(
-		const VERTEXATTRIBUTE_TYPE p_Type )
+		const struct VERTEXATTRIBUTE p_Attribute )
 	{
-		switch( p_Type )
+		switch( p_Attribute.Type )
 		{
 			case VERTEXATTRIBUTE_TYPE_UNKNOWN:
 			{

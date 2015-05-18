@@ -1,9 +1,0 @@
-{
-	"shader": {
-		"source": [
-			{ "type": "vertex", "path": "Test/Shaders/Test.vsh" },
-			{ "type": "fragment", "path": "Test/Shaders/Wireframe.fsh" }
-		]
-	}
-}
-

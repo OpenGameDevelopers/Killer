@@ -158,5 +158,14 @@ namespace Killer
 		return Vector3( m_X - p_Other.m_X, m_Y - p_Other.m_Y,
 			m_Z - p_Other.m_Z );
 	}
+
+	Vector3 &Vector3::operator+=( const Vector3 &p_Other )
+	{
+		m_X += p_Other.m_X;
+		m_Y += p_Other.m_Y;
+		m_Z += p_Other.m_Z;
+
+		return *this;
+	}
 }
 

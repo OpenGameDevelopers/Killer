@@ -49,9 +49,11 @@ namespace Killer
 		KIL_MEMSIZE FileSize = ftell( pFile );
 		rewind( pFile );
 
-		char *pSource = new char[ FileSize ];
+		char *pSource = new char[ FileSize + 1 ];
 
 		fread( pSource, 1, FileSize, pFile );
+
+		pSource[ FileSize ] = '\0';
 
 		fclose( pFile );
 		pFile = KIL_NULL;

@@ -4,10 +4,9 @@ uniform sampler2D Texture;
 uniform vec3 EyePosition;
 uniform float Shininess;
 
-varying vec4 f_Colour;
-varying vec2 f_ST;
-varying vec3 f_Normal;
 varying vec3 f_Position;
+varying vec3 f_Normal;
+varying vec2 f_ST;
 
 void main( )
 {

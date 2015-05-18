@@ -42,6 +42,8 @@ namespace Killer
 
 		Vector3 operator-( const Vector3 &p_Other ) const;
 
+		Vector3 &operator+=( const Vector3 &p_Other );
+
 	private:
 		KIL_FLOAT32	m_X;
 		KIL_FLOAT32	m_Y;
