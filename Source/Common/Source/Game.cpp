@@ -55,6 +55,8 @@ namespace Killer
 		{
 			std::cout << "[Killer::Game::Initialise] <ERROR> "
 				"Failed to initialise the gamepad" << std::endl;
+			
+			return KIL_FAIL;
 		}
 
 		m_Renderer.SetClearColour( 1.0f, 153 / 255.0f, 51.0f / 255.0f );

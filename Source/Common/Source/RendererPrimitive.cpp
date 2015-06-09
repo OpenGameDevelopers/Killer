@@ -374,20 +374,8 @@ namespace Killer
 
 		glBindVertexArray( m_VertexArrayObject );
 
-		GLenum Error = glGetError( );
-		if( Error != GL_NO_ERROR )
-		{
-			std::cout << "ERROR: " << Error << std::endl;
-		}
-
 		glDrawElements( m_GLType, m_IndexCount, GL_UNSIGNED_SHORT,
 			BUFFER_OFFSET( 0 ) );
-
-		Error = glGetError( );
-		if( Error != GL_NO_ERROR )
-		{
-			std::cout << "ERROR: " << Error << std::endl;
-		}
 
 		glBindVertexArray( 0 );
 
@@ -398,19 +386,8 @@ namespace Killer
 	{
 		glBindVertexArray( m_NormalsVertexArrayObject );
 
-		GLenum Error = glGetError( );
-		if( Error != GL_NO_ERROR )
-		{
-			std::cout << "ERROR: " << Error << std::endl;
-		}
-
 		glDrawElements( GL_LINES, m_VertexCount * 2, GL_UNSIGNED_SHORT,
 			BUFFER_OFFSET( 0 ) );
-		Error = glGetError( );
-		if( Error != GL_NO_ERROR )
-		{
-			std::cout << "ERROR: " << Error << std::endl;
-		}
 
 		glBindVertexArray( 0 );
 
@@ -429,11 +406,6 @@ namespace Killer
 
 
 		glBindVertexArray( m_WireframeVertexArrayObject );
-		GLenum Error = glGetError( );
-		if( Error != GL_NO_ERROR )
-		{
-			std::cout << "ERROR: " << Error << std::endl;
-		}
 
 		for( KIL_MEMSIZE Index = 0; Index < m_IndexCount; Index += 3 )
 		{

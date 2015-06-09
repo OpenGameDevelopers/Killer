@@ -161,7 +161,6 @@ namespace Killer
 	{
 		for( KIL_MEMSIZE Mesh = 0; Mesh < m_Meshes.size( ); ++Mesh )
 		{
-			std::cout << "Showing normals for mesh " << Mesh << std::endl;
 			m_Meshes[ Mesh ]->ShowNormals( );
 		}
 	}
@@ -170,7 +169,6 @@ namespace Killer
 	{
 		for( KIL_MEMSIZE Mesh = 0; Mesh < m_Meshes.size( ); ++Mesh )
 		{
-			std::cout << "Hiding normals for mesh " << Mesh << std::endl;
 			m_Meshes[ Mesh ]->HideNormals( );
 		}
 	}
