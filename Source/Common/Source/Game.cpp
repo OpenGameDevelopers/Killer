@@ -1,281 +1,162 @@
 #include <Game.hpp>
-#include <iostream>
-#include <iomanip>
-#include <Vector3.hpp>
-#include <FreeTimer.hpp>
-#include <Timer.hpp>
-#include <Time.hpp>
-#include <unistd.h>
-#include <locale>
-#include <RendererPrimitive.hpp>
-#include <VertexAttributes.hpp>
-#include <Camera.hpp>
 #include <cstring>
-#include <Arithmetic.hpp>
-#include <MaterialManager.hpp>
-#include <Model.hpp>
+#include <System/Memory.hpp>
+#include <unistd.h>
+#include <GameStateManager.hpp>
+#include <MainMenuState.hpp>
 
 namespace Killer
 {
 	Game::Game( )
 	{
+		m_pWindow = ZED_NULL;
+		m_pRenderer = ZED_NULL;
+		m_pInputManager = ZED_NULL;
+
+		memset( &m_Canvas, 0, sizeof( m_Canvas ) );
+		m_Running = ZED_FALSE;
 	}
 
 	Game::~Game( )
 	{
+		zedSafeDelete( m_pInputManager );
+		zedSafeDelete( m_pRenderer );
+		zedSafeDelete( m_pWindow );
 	}
 
-	KIL_UINT32 Game::Initialise( )
+	ZED_UINT32 Game::Initialise( )
 	{
-		if( m_Window.Create( ) != KIL_OK )
+		if( this->PreInitialise( ) != ZED_OK )
 		{
-			std::cout << "[Killer::Game::Initialise] <ERROR> "
-				"Failed to initialise the game window" << std::endl;
-
-			return KIL_FAIL;
+			return ZED_FAIL;
 		}
 
-		if( m_Renderer.Initialise( m_Window ) != KIL_OK )
-		{
-			std::cout << "[Killer::Game::Initialise] <ERROR> "
-				"Failed to initialise the renderer" << std::endl;
+		m_GameConfiguration.Read( );
 
-			return KIL_FAIL;
+		ZED_SINT32 X = 0, Y = 0;
+		ZED_UINT32 Width = 0, Height = 0;
+		ZED_UINT32 WindowStyle = ZED_WINDOW_STYLE_MINIMISE |
+			ZED_WINDOW_STYLE_CLOSE | ZED_WINDOW_STYLE_TITLEBAR |
+			ZED_WINDOW_STYLE_MOVE;
+		ZED_SINT32 DisplayNumber = 0, ScreenNumber = 0;
+
+		X = m_GameConfiguration.GetXPosition( );
+		Y = m_GameConfiguration.GetYPosition( );
+		Width = m_GameConfiguration.GetWidth( );
+		Height = m_GameConfiguration.GetHeight( );
+		DisplayNumber = m_GameConfiguration.GetDisplayNumber( );
+		ScreenNumber = m_GameConfiguration.GetScreenNumber( );
+
+		if( m_pWindow->Create( X, Y, Width, Height, DisplayNumber,
+			ScreenNumber, WindowStyle ) != ZED_OK )
+		{
+			zedTrace( "[Killer::Game::Initialise] <ERROR> "
+				"Failed to create window\n" );
+
+			return ZED_FAIL;
 		}
 
-		if( m_Keyboard.Initialise( ) != KIL_OK )
-		{
-			std::cout << "[Killer::Game::Initialise] <ERROR> "
-				"Failed to initialise the keyboard" << std::endl;
+		m_Canvas.Width( Width );
+		m_Canvas.Height( Height );
+		m_Canvas.BackBufferCount( 1 );
+		m_Canvas.ColourFormat( ZED_FORMAT_ARGB8 );
+		m_Canvas.DepthStencilFormat( ZED_FORMAT_D24S8 );
 
-			return KIL_FAIL;
-		}
-
-		if( m_Gamepad.Initialise( ) != KIL_OK )
+		if( m_pRenderer->Create( m_Canvas, ( *m_pWindow ) ) != ZED_OK )
 		{
-			std::cout << "[Killer::Game::Initialise] <ERROR> "
-				"Failed to initialise the gamepad" << std::endl;
+			zedTrace( "[Killer::Game::Initialise] <ERROR> "
+				"Failed to create renderer\n" );
 			
-			return KIL_FAIL;
+			return ZED_FAIL;
 		}
 
-		m_Renderer.SetClearColour( 1.0f, 153 / 255.0f, 51.0f / 255.0f );
+		m_pRenderer->ClearColour( 0.14f, 0.0f, 0.14f );
+		m_pRenderer->RenderState( ZED_RENDERSTATE_CULLMODE,
+			ZED_CULLMODE_NONE );
+		m_pRenderer->RenderState( ZED_RENDERSTATE_DEPTH, ZED_ENABLE );
+
+		if( m_pWindow->GetWindowData( &m_pWindowData ) != ZED_OK )
+		{
+			zedTrace( "[Killer::GAme::Initialise] <ERROR> "
+				"Failed to acquire the window data from the window\n" );
+
+			return ZED_FAIL;
+		}
+
+		if( m_pInputManager->Initialise( ( *m_pWindowData ) ) != ZED_OK )
+		{
+			zedTrace( "[Killer::Game::Initialise] <ERROR> "
+				"Failed to set window data for the new input manager\n" );
+
+			return ZED_FAIL;
+		}
+
+		m_Keyboard.SetUnified( );
+		m_pInputManager->AddDevice( &m_Keyboard );
+
+		if( GameStateManager::GetInstance( ).SetRenderer( m_pRenderer ) !=
+			ZED_OK )
+		{
+			zedTrace( "[Killer::Game::Initialise] <ERROR> "
+				"Failed to initialise the renderer with the "
+					"GameStateManager\n" );
 		
-		return KIL_OK;
+			return ZED_FAIL;
+		}
+
+		if( GameStateManager::GetInstance( ).Initialise( ) != ZED_OK )
+		{
+			zedTrace( "[Killer::Game::Initialise] <ERROR> "
+				"Failed to initialise the GameStateManager\n" );
+
+			return ZED_FAIL;
+		}
+
+		return ZED_OK;
 	}
 
-#pragma pack( 1 )
-	struct VERTEX
+	ZED_UINT32 Game::Execute( )
 	{
-		KIL_FLOAT32 X, Y, Z;
-		KIL_FLOAT32 R, G, B;
-		KIL_FLOAT32 S, T;
-		KIL_FLOAT32 nX, nY, nZ;
-	};
-#pragma pack( )
+		m_Running = ZED_TRUE;
 
-	KIL_UINT32 Game::Execute( )
-	{
-		std::locale::global( std::locale( "" ) );
-		std::cout.imbue( std::locale( ) );
+		MainMenuState *pMainMenu = new MainMenuState( );
+		GameStateManager::GetInstance( ).RegisterState( pMainMenu );
+		GameStateManager::GetInstance( ).PushState( "Main Menu" );
 
-		FreeTimer GameTimer;
-
-		KIL_BOOL Quit = 0;
-
-		GameTimer.Start( );
-
-		Timer Clock;
-
-		Clock.Start( );
-
-		MaterialManager MatMan;
-
-		KIL_UINT32 TextureMaterial;
-		if( MatMan.CreateMaterial( "Test/Materials/Test.material",
-			TextureMaterial ) != KIL_OK )
+		while( m_Running )
 		{
-			std::cout << "[Killer::Game::Execute] <ERROR> "
-				"Failed to create texture material" << std::endl;
+			m_pWindow->Update( );
+			m_pInputManager->Update( );
+			m_pWindow->FlushEvents( ZED_WINDOW_FLUSH_NONE );
 
-			return KIL_FAIL;
+			if( m_pWindow->Resized( ) )
+			{
+				m_GameConfiguration.SetWidth( m_pWindow->GetWidth( ) );
+				m_GameConfiguration.SetHeight( m_pWindow->GetHeight( ) );
+			}
+
+			if( m_pWindow->Moved( ) )
+			{
+				m_GameConfiguration.SetXPosition( m_pWindow->GetXPosition( ) );
+				m_GameConfiguration.SetYPosition( m_pWindow->GetYPosition( ) );
+			}
+
+			if( m_Keyboard.IsKeyDown( ZED_KEY_ESCAPE ) )
+			{
+				m_Running = ZED_FALSE;
+			}
+
+			GameStateManager::GetInstance( ).Execute( );
+
+			if( GameStateManager::GetInstance( ).IsRunning( ) == ZED_FALSE )
+			{
+				m_Running = ZED_FALSE;
+			}
 		}
 
-		KIL_UINT32 PositionSolidColourMaterial;
+		m_GameConfiguration.Write( );
 
-		if( MatMan.CreateMaterial(
-			"Test/Materials/PositionSolidColour.material",
-			PositionSolidColourMaterial ) != KIL_OK )
-		{
-			std::cout << "[Killer::Game::Execute] <ERROR> "
-				"Failed to create wireframe material" << std::endl;
-
-			return KIL_FAIL;
-		}
-
-		Model CubeModel( &MatMan );
-
-		if( CubeModel.Load( "Test/Models/TestModel.killer" ) != KIL_OK )
-		{
-			std::cout << "[Killer::Game::Executable] <ERROR> "
-				"Failed to load model" << std::endl;
-
-			return KIL_FAIL;
-		}
-
-		Camera TestCamera;
-
-		TestCamera.SetClippingPlanes( 1.0f, 100000.0f );
-		TestCamera.SetFieldOfView( Killer::Pi / 2 );
-		TestCamera.SetPosition( 0.0f, 0.0f, 100.0f );
-		TestCamera.SetLookPoint( 0.0f, 0.0f, 0.0f );
-		TestCamera.SetWorldUp( 0.0f, 1.0f, 0.0f );
-		TestCamera.SetAspectRatio( 800.0f / 480.0f );
-		TestCamera.SetProjectionMode( PROJECTIONMODE_PERSPECTIVE );
-
-		TestCamera.CalculateProjectionMatrix( );
-		TestCamera.CalculateViewMatrix( );
-
-		KIL_FLOAT32 ZPosition, ZInc;
-
-		ZPosition = 100.0f;
-		ZInc = 1.0f;
-
-		KIL_KEY_STATE OldKeyState;
-		m_Keyboard.GetState( &OldKeyState );
-		KIL_BOOL WireframeMode = KIL_FALSE;
-		glEnable( GL_DEPTH_TEST );
-		glEnable( GL_CULL_FACE );
-		glFrontFace( GL_CCW );
-		glCullFace( GL_BACK );
-		KIL_FLOAT32 RotateY = 0.0f;
-		KIL_FLOAT32 RotateX = 0.0f;
-
-		KIL_FLOAT32 XTrans = 0.0f, YTrans = 0.0f, ZTrans = 0.0f;
-
-		KIL_BOOL NormalsActive = KIL_FALSE;
-
-		while( !Quit )
-		{
-			m_Window.ProcessEvents( );
-			KIL_KEY_STATE CurrentKeyState;
-			GAMEPAD_STATE CurrentGamepadState;
-
-			m_Keyboard.GetState( &CurrentKeyState );
-			m_Gamepad.GetState( &CurrentGamepadState );
-
-			if( CurrentKeyState.Keys[ KIL_KEY_ESCAPE ] )
-			{
-				Quit = KIL_TRUE;
-			}
-
-			if( CurrentKeyState.Keys[ KIL_KEY_N ] &&
-				( OldKeyState.Keys[ KIL_KEY_N ] !=
-					CurrentKeyState.Keys[ KIL_KEY_N ] ) )
-			{
-				if( NormalsActive )
-				{
-					CubeModel.HideNormals( );
-				}
-				else
-				{
-					CubeModel.ShowNormals( );
-				}
-
-				NormalsActive = !NormalsActive;
-			}
-
-			if( CurrentKeyState.Keys[ KIL_KEY_W ] &&
-				( OldKeyState.Keys[ KIL_KEY_W ] !=
-					CurrentKeyState.Keys[ KIL_KEY_W ] ) )
-			{
-				WireframeMode = !WireframeMode;
-
-				if( WireframeMode )
-				{
-					glDisable( GL_CULL_FACE );
-					CubeModel.ToggleWireframe( );
-				}
-				else
-				{
-					glEnable( GL_CULL_FACE );
-					glFrontFace( GL_CCW );
-					glCullFace( GL_BACK );
-
-					CubeModel.ToggleWireframe( );
-				}
-			}
-
-			RotateY += CurrentGamepadState.AnalogueStick[ 1 ].X * 0.01f;
-			RotateX += CurrentGamepadState.AnalogueStick[ 1 ].Y * 0.01f;
-
-
-			ZTrans += CurrentGamepadState.AnalogueStick[ 0 ].Y * 0.1f;
-			XTrans += CurrentGamepadState.AnalogueStick[ 0 ].X * 0.1f;
-
-			if( CurrentGamepadState.Buttons & GAMEPAD_BUTTON_L )
-			{
-				YTrans += 0.01f;
-			}
-			if( CurrentGamepadState.Buttons & GAMEPAD_BUTTON_R )
-			{
-				YTrans -= 0.01f;
-			}
-
-			CubeModel.SetPosition( Vector3( XTrans, YTrans, ZTrans ) );
-			CubeModel.SetOrientation( Vector3( RotateX, RotateY, 0.0f ) );
-
-			if( CurrentGamepadState.Buttons & GAMEPAD_BUTTON_START )
-			{
-				Quit = KIL_TRUE;
-			}
-			
-			m_Renderer.Clear( );
-			TestCamera.SetPosition( 0.0f, 0.0f, ZPosition );
-			TestCamera.CalculateViewMatrix( );
-			
-			CubeModel.Render( TestCamera );
-
-			m_Renderer.SwapBuffers( );
-
-			if( Clock.GetSeconds( ) >= 1 )
-			{
-				BEAT_TIME BeatTime;
-				GetBeatTime( BeatTime );
-
-				std::cout << "@" << std::setfill( '0' ) << std::setw( 3 ) <<
-					BeatTime.Beat << "." << std::setw( 2 ) <<
-					BeatTime.CentiBeat << std::endl;
-
-				Clock.Stop( );
-				Clock.Start( );
-			}
-
-			/*if( ZPosition > 1000.0f )
-			{
-				ZInc = -1.0f;
-			}
-
-			if( ZPosition < 100.0f )
-			{
-				ZInc = 1.0f;
-			}
-
-			ZPosition += ZInc;*/
-
-			memcpy( &OldKeyState, &CurrentKeyState, sizeof( OldKeyState ) );
-		}
-
-		GameTimer.Stop( );
-
-		// Use LC_ALL=<LANG> to get correct format
-		// LC_ALL=en_GB - British English
-		// LC_ALL=de_DE - German
-		// LC_ALL=ja_JP - Japanese
-		std::cout << "Total running time: " << GameTimer.GetMicroseconds( ) <<
-			"\u00B5s" << std::endl;
-
-		return KIL_OK;
+		return ZED_OK;
 	}
 }
 

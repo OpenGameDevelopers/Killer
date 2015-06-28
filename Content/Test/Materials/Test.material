@@ -1,9 +1,13 @@
 {
-	"shader": {
-		"source": [
-			{ "type": "vertex", "path": "Test/Shaders/Test.vsh" },
-			{ "type": "fragment", "path": "Test/Shaders/Test.fsh" }
-		]
+	"shader": [
+		{ "language": "glsl", "source": [
+			{ "vertex": [
+				{ "version": "110", "path": "Test/Shaders/GLSL/110/Test.vsh" },
+				{ "version": "330", "path": "Test/Shaders/GLSL/330/Test.vsh" } ] },
+			{ "fragment": [
+			  	{ "version": "110", "path": "Test/Shaders/GLSL/110/Test.fsh" },
+				{ "version": "330", "path": "Test/Shaders/GLSL/330/Test.fsh" } ] }
+		}
 	},
 	"texture": [
 		{ "type": "albedo", "path": "Test/Textures/512x512.tga" }

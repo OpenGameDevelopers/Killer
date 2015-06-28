@@ -1,11 +1,14 @@
-#ifndef __KILLER_GAME_HPP__
-#define __KILLER_GAME_HPP__
+#ifndef ___GAME_HPP__
+#define ___GAME_HPP__
 
-#include <DataTypes.hpp>
-#include <GameWindow.hpp>
-#include <Renderer.hpp>
-#include <Keyboard.hpp>
-#include <Gamepad.hpp>
+#include <System/DataTypes.hpp>
+#include <System/Window.hpp>
+#include <System/WindowData.hpp>
+#include <System/Keyboard.hpp>
+#include <System/InputManager.hpp>
+#include <Renderer/Renderer.hpp>
+#include <Renderer/CanvasDescription.hpp>
+#include <Configuration.hpp>
 
 namespace Killer
 {
@@ -15,16 +18,23 @@ namespace Killer
 		Game( );
 		~Game( );
 
-		KIL_UINT32 Initialise( );
-		KIL_UINT32 Execute( );
+		ZED_UINT32 Initialise( );
+		ZED_UINT32 Execute( );
 
 	private:
-		GameWindow	m_Window;
-		Renderer	m_Renderer;
-		Keyboard	m_Keyboard;
-		Gamepad		m_Gamepad;
+		ZED_UINT32 PreInitialise( );
+
+		ZED::System::Window					*m_pWindow;
+		ZED::System::WindowData				*m_pWindowData;
+		ZED::System::InputManager			*m_pInputManager;
+		ZED::System::Keyboard				m_Keyboard;
+		ZED::Renderer::Renderer				*m_pRenderer;
+		ZED::Renderer::CanvasDescription	m_Canvas;
+		Configuration						m_GameConfiguration;
+
+		ZED_BOOL	m_Running;
 	};
 }
 
-#endif // __KILLER_GAME_HPP__
+#endif
 
