@@ -15,8 +15,10 @@ namespace Killer
 		Game( );
 		~Game( );
 
+		KIL_UINT32 PlatformInitialise( );
 		KIL_UINT32 Initialise( );
 		KIL_UINT32 Execute( );
+		KIL_UINT32 PlatformTerminate( );
 
 	private:
 		GameWindow	m_Window;

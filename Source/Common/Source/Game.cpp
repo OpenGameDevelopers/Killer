@@ -27,6 +27,11 @@ namespace Killer
 
 	KIL_UINT32 Game::Initialise( )
 	{
+		if( this->PlatformInitialise( ) != KIL_OK )
+		{
+			return KIL_FAIL;
+		}
+
 		if( m_Window.Create( ) != KIL_OK )
 		{
 			std::cout << "[Killer::Game::Initialise] <ERROR> "
@@ -274,6 +279,8 @@ namespace Killer
 		// LC_ALL=ja_JP - Japanese
 		std::cout << "Total running time: " << GameTimer.GetMicroseconds( ) <<
 			"\u00B5s" << std::endl;
+
+		this->PlatformTerminate( );
 
 		return KIL_OK;
 	}

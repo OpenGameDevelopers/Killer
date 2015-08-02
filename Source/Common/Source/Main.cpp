@@ -1,17 +1,9 @@
 #include <Game.hpp>
 #include <GitVersion.hpp>
 #include <iostream>
-#include <PandoraFullscreen.hpp>
 
 int main( int p_Argc, char **p_ppArgv )
 {
-	if( Killer::EnterPandoraFullscreen( ) != KIL_OK )
-	{
-		std::cout << "[Killer::main] <ERROR> "
-			"Failed to enter fullscreen mode" << std::endl;
-
-		return KIL_FAIL;
-	}
 
 	std::cout << "Killer" << std::endl;
 	std::cout << "Build Information" << std::endl;
@@ -30,8 +22,6 @@ int main( int p_Argc, char **p_ppArgv )
 	}
 
 	Killer.Execute( );
-
-	Killer::ExitPandoraFullscreen( );
 
 	return KIL_OK;
 }
